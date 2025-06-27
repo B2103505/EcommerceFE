@@ -1,22 +1,22 @@
 import React from 'react';
-import { Form, Input, Button } from 'antd';
+import { Form, Input, Button, message } from 'antd';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 
 const PageWrapper = styled.div`
   min-height: 100vh;
-  background: linear-gradient(135deg,rgb(117, 238, 117),rgb(154, 165, 154));
+  background: linear-gradient(135deg, rgba(167, 235, 167, 0.74), rgb(201, 223, 201));
   display: flex;
   justify-content: center;
   align-items: center;
 `;
 
-const LoginWrapper = styled.div`
+const ForgotWrapper = styled.div`
   width: 400px;
   padding: 32px;
   backdrop-filter: blur(8px);
-  background: rgb(156, 221, 186);
-  border: 1px solid rgba(39, 101, 56, 0.4);
+  background: rgb(138, 170, 93);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: 16px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
   color: #fff;
@@ -34,17 +34,19 @@ const Title = styled.h2`
   font-family: 'Segoe UI', sans-serif;
 `;
 
-const SignInPage = () => {
+const ForgotPasswordPage = () => {
     const onFinish = (values) => {
-        console.log('Login info:', values);
+        console.log('Forgot password request:', values);
+        // call API forgot password ở đây nếu cần
+        message.success('Đã gửi yêu cầu đặt lại mật khẩu. Vui lòng kiểm tra email!');
     };
 
     return (
         <PageWrapper>
-            <LoginWrapper>
-                <Title>Đăng nhập</Title>
+            <ForgotWrapper>
+                <Title>Quên mật khẩu</Title>
                 <Form
-                    name="login-form"
+                    name="forgot-password-form"
                     onFinish={onFinish}
                     layout="vertical"
                 >
@@ -56,18 +58,7 @@ const SignInPage = () => {
                             { type: 'email', message: 'Email không hợp lệ!' },
                         ]}
                     >
-                        <Input placeholder="Nhập email của bạn" />
-                    </Form.Item>
-
-                    <Form.Item
-                        label={<span style={{ color: '#fff' }}>Mật khẩu</span>}
-                        name="password"
-                        rules={[
-                            { required: true, message: 'Vui lòng nhập mật khẩu!' },
-                            { min: 6, message: 'Mật khẩu phải từ 6 ký tự!' },
-                        ]}
-                    >
-                        <Input.Password placeholder="Nhập mật khẩu" />
+                        <Input placeholder="Nhập email đã đăng ký" />
                     </Form.Item>
 
                     <Form.Item>
@@ -81,27 +72,17 @@ const SignInPage = () => {
                                 fontWeight: 'bold',
                             }}
                         >
-                            Đăng nhập
+                            Gửi yêu cầu
                         </Button>
                     </Form.Item>
 
-                    <Form.Item style={{ textAlign: 'center', marginBottom: 0 }}>
-                        <Link to="/forgot-password"
-                            style={{ color: '#fff', textDecoration: 'underline' }}>
-                            Quên mật khẩu?
-                        </Link>
-                    </Form.Item>
-
                     <Form.Item style={{ textAlign: 'center', color: '#fff' }}>
-                        Chưa có tài khoản? <Link to="/sign-up"
-                            style={{ color: '#fff', textDecoration: 'underline' }}
-                        >Đăng ký ngay</Link>
+                        Đã nhớ mật khẩu? <Link to="/sign-in" style={{ color: '#fff', textDecoration: 'underline' }}>Đăng nhập</Link>
                     </Form.Item>
-
                 </Form>
-            </LoginWrapper>
+            </ForgotWrapper>
         </PageWrapper>
     );
 };
 
-export default SignInPage;
+export default ForgotPasswordPage;

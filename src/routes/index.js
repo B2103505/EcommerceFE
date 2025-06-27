@@ -1,5 +1,6 @@
 import CategoryPage from "../pages/CategoryPage/CategoryPage";
 import DetailProductPage from "../pages/DetailProductPage/DetailProductPage";
+import ForgotPasswordPage from "../pages/ForgotPasswordPage/ForgotPasswordPage";
 import HomePage from "../pages/HomePage/HomePage";
 import NotfoundPage from "../pages/NotfoundPage/NotfoundPage";
 import OrderPage from "../pages/OrderPage/OrderPage";
@@ -31,12 +32,17 @@ export const routes = [
     {
         path: '/sign-in',
         page: SignInPage,
-        isShowHeader: true
+        isShowHeader: false
     },
     {
         path: '/sign-up',
         page: SignUpPage,
-        isShowHeader: true
+        isShowHeader: false
+    },
+    {
+        path: '/forgot-password',
+        page: ForgotPasswordPage,
+        isShowHeader: false
     },
     {
         path: '/detail-product',

@@ -7,7 +7,6 @@ import slider2 from '../../assets/images/slider_2.webp';
 import slider3 from '../../assets/images/slider_3.jpg';
 import CardComponent from "../../components/CardComponent/CardComponent";
 import NavBarComponent from "../../components/NavBarComponent/NavBarComponent";
-import ButtonComponent from "../../components/ButtonComponent/ButtonComponent";
 
 const HomePage = () => {
     const arr = ['Cây nội thất', 'Cây bonsai', 'Cây hoa cảnh', 'Cây phong thủy', 'Cây ăn quả mini', 'Chậu cây & Phụ kiện']

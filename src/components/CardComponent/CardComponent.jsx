@@ -13,7 +13,7 @@ const CardComponent = () => {
             <WrapperRateProduct>
                 <span style={{ marginRight: '15px' }}>
                     <span>5.0 </span>
-                    <StarFilled style={{ fontSize: '14px', color: 'rgb(217, 225, 61)' }} />
+                    <StarFilled style={{ fontSize: '14px', color: 'rgb(253, 216, 54)' }} />
                 </span>
                 <span>|</span>
                 <span style={{ marginLeft: '15px' }}>Đã bán 542</span>
