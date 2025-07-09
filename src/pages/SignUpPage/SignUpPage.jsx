@@ -1,7 +1,11 @@
 import React from 'react';
-import { Form, Input, Button } from 'antd';
+import { Form, Input, Button, message } from 'antd';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
+import * as UserService from '../../Service/UserService'
+import { useMutationHooks } from '../../hooks/useMutationHook';
+import { toast } from 'react-toastify';
+// import { message } from 'antd';
 
 const PageWrapper = styled.div`
   min-height: 100vh;
@@ -35,9 +39,22 @@ const Title = styled.h2`
 `;
 
 const SignUpPage = () => {
+
+    const mutation = useMutationHooks(data => UserService.SignUpUser(data))
+
     const onFinish = (values) => {
-        console.log('Register info:', values);
+        // console.log('Register info:', values);
         // call API register ở đây
+        mutation.mutate(values, {
+            onSuccess: (res) => {
+                console.log('res', res.status)
+                if (res.status === 'ERR') {
+                    toast.error(res.message);
+                } else {
+                    toast.success('Đăng ký thành công!');
+                }
+            }
+        });
     };
 
     return (
@@ -51,7 +68,7 @@ const SignUpPage = () => {
                 >
                     <Form.Item
                         label={<span style={{ color: '#fff' }}>Họ tên</span>}
-                        name="fullname"
+                        name="User_Fullname"
                         rules={[{ required: true, message: 'Vui lòng nhập họ tên!' }]}
                     >
                         <Input placeholder="Nhập họ tên của bạn" />
@@ -59,7 +76,7 @@ const SignUpPage = () => {
 
                     <Form.Item
                         label={<span style={{ color: '#fff' }}>Email</span>}
-                        name="email"
+                        name="User_Email"
                         rules={[
                             { required: true, message: 'Vui lòng nhập Email!' },
                             { type: 'email', message: 'Email không hợp lệ!' },
@@ -70,7 +87,7 @@ const SignUpPage = () => {
 
                     <Form.Item
                         label={<span style={{ color: '#fff' }}>Số điện thoại</span>}
-                        name="phone"
+                        name="User_PhoneNumber"
                         rules={[
                             { required: true, message: 'Vui lòng nhập số điện thoại!' },
                             { pattern: /^\d{9,11}$/, message: 'Số điện thoại không hợp lệ!' },
@@ -81,7 +98,7 @@ const SignUpPage = () => {
 
                     <Form.Item
                         label={<span style={{ color: '#fff' }}>Mật khẩu</span>}
-                        name="password"
+                        name="User_Password"
                         rules={[
                             { required: true, message: 'Vui lòng nhập mật khẩu!' },
                             { min: 6, message: 'Mật khẩu phải từ 6 ký tự!' },
@@ -93,13 +110,13 @@ const SignUpPage = () => {
                     <Form.Item
                         label={<span style={{ color: '#fff' }}>Xác nhận mật khẩu</span>}
                         name="confirm"
-                        dependencies={['password']}
+                        dependencies={['User_Password']}
                         hasFeedback
                         rules={[
                             { required: true, message: 'Vui lòng xác nhận mật khẩu!' },
                             ({ getFieldValue }) => ({
                                 validator(_, value) {
-                                    if (!value || getFieldValue('password') === value) {
+                                    if (!value || getFieldValue('User_Password') === value) {
                                         return Promise.resolve();
                                     }
                                     return Promise.reject(new Error('Mật khẩu xác nhận không khớp!'));

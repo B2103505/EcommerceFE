@@ -7,47 +7,48 @@ const NavBarComponent = ({ children }) => {
     const renderContentNav = (type, options) => {
         switch (type) {
             case 'text':
-                return options.map((option) => {
+                return options.map((option, index) => {
                     return (
-                        <WrapperTextValue>{option}</WrapperTextValue>
+                        <WrapperTextValue key={`text-${index}`}>{option}</WrapperTextValue>
                     )
                 })
             case 'checkbox':
                 return (
-                    <Checkbox.Group style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '8px' }}
-                        onChange={onchange}>
+                    <Checkbox.Group
+                        style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '8px' }}
+                        onChange={onchange}
+                    >
                         {options.map((option) => {
                             return (
-                                <Checkbox value={option.value}>{option.label}</Checkbox>
+                                <Checkbox key={`checkbox-${option.value}`} value={option.value}>
+                                    {option.label}
+                                </Checkbox>
                             )
                         })}
                     </Checkbox.Group>
                 )
             case 'star':
-                return (
-                    options.map((option) => {
-                        return (
-                            <div style={{ display: 'flex', }}>
-                                <Rate style={{ fontSize: '12px' }} disabled defaultValue={option} />
-                                <span style={{ fontSize: '12px', marginLeft: '5px' }}>
-                                    {`Từ ${option} sao`}
-                                </span>
-                            </div>
-                        )
-                    })
-                )
+                return options.map((option, index) => {
+                    return (
+                        <div key={`star-${index}`} style={{ display: 'flex' }}>
+                            <Rate style={{ fontSize: '12px' }} disabled defaultValue={option} />
+                            <span style={{ fontSize: '12px', marginLeft: '5px' }}>
+                                {`Từ ${option} sao`}
+                            </span>
+                        </div>
+                    )
+                })
             case 'price':
-                return (
-                    options.map((option) => {
-                        return (
-                            <WrapperTextPrice>{option}</WrapperTextPrice>
-                        )
-                    })
-                )
+                return options.map((option, index) => {
+                    return (
+                        <WrapperTextPrice key={`price-${index}`}>{option}</WrapperTextPrice>
+                    )
+                })
             default:
-                return {}
+                return null;
         }
     }
+
 
     return (
         <div style={{ backgroundColor: '#fff' }}>

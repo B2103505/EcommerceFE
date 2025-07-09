@@ -2,6 +2,10 @@ import React from 'react';
 import { Form, Input, Button } from 'antd';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
+import * as UserService from '../../Service/UserService'
+import { useMutationHooks } from '../../hooks/useMutationHook';
+import { toast } from 'react-toastify';
 
 const PageWrapper = styled.div`
   min-height: 100vh;
@@ -35,9 +39,29 @@ const Title = styled.h2`
 `;
 
 const SignInPage = () => {
+
+    // const mutation = useMutation({
+    //     mutationFn: data => UserService.LoginUser(data)
+    // })
+
+    const mutation = useMutationHooks(data => UserService.LoginUser(data))
+
     const onFinish = (values) => {
-        console.log('Login info:', values);
+        // console.log('Login info:', values);
+        
+        mutation.mutate(values, {
+            onSuccess: (res) => {
+                console.log('res', res.status)
+                if (res.status === 'ERR') {
+                    toast.error(res.message);
+                } else {
+                    toast.success('Đăng nhập thành công!');
+                }
+            }
+        });
     };
+
+
 
     return (
         <PageWrapper>
@@ -50,7 +74,7 @@ const SignInPage = () => {
                 >
                     <Form.Item
                         label={<span style={{ color: '#fff' }}>Email</span>}
-                        name="email"
+                        name="User_Email"
                         rules={[
                             { required: true, message: 'Vui lòng nhập Email!' },
                             { type: 'email', message: 'Email không hợp lệ!' },
@@ -61,7 +85,7 @@ const SignInPage = () => {
 
                     <Form.Item
                         label={<span style={{ color: '#fff' }}>Mật khẩu</span>}
-                        name="password"
+                        name="User_Password"
                         rules={[
                             { required: true, message: 'Vui lòng nhập mật khẩu!' },
                             { min: 6, message: 'Mật khẩu phải từ 6 ký tự!' },
