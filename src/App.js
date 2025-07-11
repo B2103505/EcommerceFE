@@ -15,12 +15,13 @@ import 'react-toastify/dist/ReactToastify.css';
 import { isJsonString } from './utils';
 import { jwtDecode } from 'jwt-decode';
 import * as UserService from './Service/UserService'
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { updateUser } from './redux/slice/userSlice';
 
 function App() {
 
   const dispatch = useDispatch()
+  const user = useSelector((state) => state.user)
 
   useEffect(() => {
     const { storeData, decoded } = handleDecoded()
@@ -56,16 +57,15 @@ function App() {
     if (!id || !token) return;
     const respn = await UserService.getDetailUser(id, token)
     dispatch(updateUser({ ...respn?.data, access_token: token }))
-    // console.log('response', respn)
   }
 
-  const fetchApi = async () => {
-    const res = await axios.get(`${process.env.REACT_APP_API_KEY}/plant/getAllPlant`)
-    return res.data
-  }
+  // const fetchApi = async () => {
+  //   const res = await axios.get(`${process.env.REACT_APP_API_KEY}/plant/getAllPlant`)
+  //   return res.data
+  // }
 
-  const query = useQuery({ queryKey: ['todos'], queryFn: fetchApi })
-  if (query.data) console.log('query', query.data)
+  // const query = useQuery({ queryKey: ['todos'], queryFn: fetchApi })
+  // if (query.data) console.log('query', query.data)
 
   return (
     <div>
@@ -73,7 +73,9 @@ function App() {
         <Routes>
           {routes.map((route) => {
             const Page = route.page
+            const isCheckAuth = !route.isPrivate || user.isPermis
             const Layout = route.isShowHeader ? DefaultComponent : React.Fragment;
+            if (!isCheckAuth) return null;
             return (
               <Route key={route.path} path={route.path} element={
                 <Layout>

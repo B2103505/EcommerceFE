@@ -1,28 +1,30 @@
 import React from "react";
 import { StyleNameProduct, WrapperCardStyle, WrapperDiscountProduct, WrapperPriceProduct, WrapperRateProduct } from "./style";
 import { StarFilled } from '@ant-design/icons';
-const CardComponent = () => {
+const CardComponent = ({ data }) => {
     return (
         <WrapperCardStyle
             hoverable
             style={{ width: 200 }}
             styles={{ body: { padding: 10 } }}
-            cover={<img alt='example' src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />}>
+            cover={
+                <img alt={data?.Plant_Name || "Hình ảnh cây"}
+                    src={data?.Plant_Image || "https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png"} />}>
 
-            <StyleNameProduct>Hồng Môn</StyleNameProduct>
+            <StyleNameProduct>{data?.Plant_Name}</StyleNameProduct>
             <WrapperRateProduct>
                 <span style={{ marginRight: '15px' }}>
-                    <span>5.0 </span>
+                    <span>{data?.Plant_averageRating?.toFixed(1) || "0.0"}</span>
                     <StarFilled style={{ fontSize: '14px', color: 'rgb(253, 216, 54)' }} />
                 </span>
                 <span>|</span>
-                <span style={{ marginLeft: '15px' }}>Đã bán 542</span>
+                <span style={{ marginLeft: '15px' }}>Đã bán {data?.Plant_Sold || 0}</span>
             </WrapperRateProduct>
 
             <WrapperPriceProduct>
-                250.000đ
+                {data?.Plant_Price?.toLocaleString('vi-VN')}đ
                 <WrapperDiscountProduct>
-                    -10%
+                    {data?.Discount || "-10%"}
                 </WrapperDiscountProduct>
             </WrapperPriceProduct>
         </WrapperCardStyle>

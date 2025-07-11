@@ -1,25 +1,3 @@
-// import React from "react";
-
-// import { WrapperContentProfile, WrapperHeader } from "./style";
-
-// const ProfileUserPage = () => {
-//     return (
-
-//         <div style={{ padding: '0 120px' }}>
-//             <WrapperHeader>
-//                 Thông tin người dùng
-//             </WrapperHeader>
-//             <WrapperContentProfile>
-
-//             </WrapperContentProfile>
-
-//         </div>
-//     )
-// }
-
-// export default ProfileUserPage;
-
-
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { useSelector, useDispatch } from 'react-redux';
@@ -29,13 +7,28 @@ import { updateUser } from '../../redux/slice/userSlice';
 import { PageWrapper, ProfileWrapper, Title } from './style';
 import { useMutationHooks } from '../../hooks/useMutationHook';
 import { toast } from 'react-toastify';
+import { uploadImageToCloudinary } from '../../utils/CloudinaryUpload'
 
 const UserProfilePage = () => {
     const [form] = Form.useForm();
     const dispatch = useDispatch();
     const user = useSelector(state => state.user);
-    const mutation = useMutationHooks(({ User_Id, data }) => UserService.updateUser(User_Id, data));
+    const mutation = useMutationHooks(({ User_Id, data, access_token }) => UserService.updateUser(User_Id, data, access_token));
     const { data } = mutation
+
+    const handleUploadAvatar = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        try {
+            const url = await uploadImageToCloudinary(file);
+            form.setFieldsValue({ User_Avatar: url }); // Gán URL trả về vào form
+            toast.success('Tải ảnh thành công!');
+        } catch (err) {
+            console.error('Upload error:', err);
+            toast.error('Tải ảnh thất bại!');
+        }
+    };
 
     useEffect(() => {
         // Đổ dữ liệu cũ vào form
@@ -117,6 +110,11 @@ const UserProfilePage = () => {
                     >
                         <Input placeholder="https://..." />
                     </Form.Item>
+
+                    <Form.Item label="Tải ảnh mới">
+                        <input type="file" accept="image/*" onChange={handleUploadAvatar} />
+                    </Form.Item>
+
 
                     <Form.Item>
                         <Button type="primary" htmlType="submit" block>
