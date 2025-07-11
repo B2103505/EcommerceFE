@@ -12,12 +12,52 @@ import { useQuery } from '@tanstack/react-query';
 // ✅ Thêm import cho Toastify
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { isJsonString } from './utils';
+import { jwtDecode } from 'jwt-decode';
+import * as UserService from './Service/UserService'
+import { useDispatch } from 'react-redux';
+import { updateUser } from './redux/slice/userSlice';
 
 function App() {
 
-  // useEffect(() => {
-  //   fetchApi()
-  // }, [])
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    const { storeData, decoded } = handleDecoded()
+    if (decoded?.id && storeData) {
+      handleGetDetailsUser(decoded?.id, storeData)
+    }
+  }, [])
+
+  const handleDecoded = () => {
+    let storeData = localStorage.getItem('access_token')
+    let decoded = {}
+
+    if (storeData && isJsonString(storeData)) {
+      storeData = JSON.parse(storeData)
+      decoded = jwtDecode(storeData)
+    }
+    return { decoded, storeData }
+  }
+
+  UserService.axiosJWT.interceptors.request.use(async (config) => {
+    const currTime = new Date()
+    const { decoded } = handleDecoded()
+    if (decoded?.exp < currTime.getTime() / 1000) {
+      const data = await UserService.refreshToken()
+      config.headers['authorization'] = `Bearer ${data?.access_token}`
+    }
+    return config;
+  }, function (error) {
+    return Promise.reject(error)
+  })
+
+  const handleGetDetailsUser = async (id, token) => {
+    if (!id || !token) return;
+    const respn = await UserService.getDetailUser(id, token)
+    dispatch(updateUser({ ...respn?.data, access_token: token }))
+    // console.log('response', respn)
+  }
 
   const fetchApi = async () => {
     const res = await axios.get(`${process.env.REACT_APP_API_KEY}/plant/getAllPlant`)

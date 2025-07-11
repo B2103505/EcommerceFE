@@ -2,10 +2,13 @@ import React from 'react';
 import { Form, Input, Button } from 'antd';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
-import { useMutation } from '@tanstack/react-query';
 import * as UserService from '../../Service/UserService'
 import { useMutationHooks } from '../../hooks/useMutationHook';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
+import { useDispatch } from 'react-redux';
+import { updateUser } from '../../redux/slice/userSlice';
 
 const PageWrapper = styled.div`
   min-height: 100vh;
@@ -40,28 +43,39 @@ const Title = styled.h2`
 
 const SignInPage = () => {
 
-    // const mutation = useMutation({
-    //     mutationFn: data => UserService.LoginUser(data)
-    // })
+    const dispatch = useDispatch()
+    const navigate = useNavigate();
 
     const mutation = useMutationHooks(data => UserService.LoginUser(data))
 
     const onFinish = (values) => {
-        // console.log('Login info:', values);
-        
+
         mutation.mutate(values, {
             onSuccess: (res) => {
-                console.log('res', res.status)
                 if (res.status === 'ERR') {
                     toast.error(res.message);
                 } else {
                     toast.success('Đăng nhập thành công!');
+                    setTimeout(() => {
+                        navigate('/');
+                        localStorage.setItem('access_token', JSON.stringify(res?.access_token) )
+                        if (res?.access_token) {
+                            const decoded = jwtDecode(res?.access_token)
+                            if (decoded?.id) {
+                                handleGetDetailsUser(decoded?.id, res?.access_token)
+                            }
+                        }
+                    }, 500);
                 }
             }
         });
     };
 
-
+    const handleGetDetailsUser = async (id, token) => {
+        const respn = await UserService.getDetailUser(id, token)
+        dispatch(updateUser({ ...respn?.data, access_token: token }))
+        console.log('response', respn)
+    }
 
     return (
         <PageWrapper>

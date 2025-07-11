@@ -5,7 +5,8 @@ import { Link } from 'react-router-dom';
 import * as UserService from '../../Service/UserService'
 import { useMutationHooks } from '../../hooks/useMutationHook';
 import { toast } from 'react-toastify';
-// import { message } from 'antd';
+// import * as messageComponent from '../../components/MessageComponent/MessageComponent'
+import { useNavigate } from 'react-router-dom';
 
 const PageWrapper = styled.div`
   min-height: 100vh;
@@ -40,6 +41,8 @@ const Title = styled.h2`
 
 const SignUpPage = () => {
 
+    const navigate = useNavigate();
+
     const mutation = useMutationHooks(data => UserService.SignUpUser(data))
 
     const onFinish = (values) => {
@@ -47,11 +50,14 @@ const SignUpPage = () => {
         // call API register ở đây
         mutation.mutate(values, {
             onSuccess: (res) => {
-                console.log('res', res.status)
+                // console.log('res', res.status)
                 if (res.status === 'ERR') {
                     toast.error(res.message);
                 } else {
                     toast.success('Đăng ký thành công!');
+                    setTimeout(() => {
+                        navigate('/sign-in');
+                    }, 2000);
                 }
             }
         });

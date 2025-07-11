@@ -1,8 +1,9 @@
-import React from "react";
-import { Badge, Col } from 'antd'
+import React, { useState } from "react";
+import { Badge, Col, Popover } from 'antd'
 import {
     WrapperHeader, WrapperText,
-    WrapperHeaderAccount, WrapperTextSmall
+    WrapperHeaderAccount, WrapperTextSmall,
+    WrapperTextPopupUser
 } from "./style";
 import {
     CaretDownOutlined,
@@ -11,26 +12,46 @@ import {
 } from '@ant-design/icons';
 import ButtonInputSearch from "../ButtonInputSearch/ButtonInputSearch";
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from "react-redux";
+import * as UserService from '../../Service/UserService'
+import { resetUser } from '../../redux/slice/userSlice'
 
 const HeaderComponent = () => {
     const navigate = useNavigate();
+    const user = useSelector((state) => state.user)
+    const dispatch = useDispatch()
+    // const { Loading, setLoading } = useState(false)
 
+    const handleLogout = async () => {
+        // setLoading(true)
+        await UserService.LogoutUser()
+        localStorage.removeItem('access_token');
+        dispatch(resetUser())
+        // setLoading(false)
+    }
+
+    const handleGetDetail = async () => {
+        console.log('detail user', user)
+        navigate('/profile-user')
+    }
+
+    const content = () => {
+        return (
+            <div>
+                <WrapperTextPopupUser onClick={handleGetDetail}>Thông tin người dùng</WrapperTextPopupUser>
+                <WrapperTextPopupUser onClick={handleLogout}>Đăng xuất</WrapperTextPopupUser>
+            </div>
+        )
+    }
     const handleRedirect = () => {
-        const isLoggedIn = localStorage.getItem('userToken');
-
-        if (isLoggedIn) {
-            navigate('/account-page');
-        } else {
-            navigate('/sign-in');
-        }
-
-        //localStorage.removeItem('userToken'); đăng xuất xóa userToken
+        navigate('/sign-in');
     };
 
     return (
         <div>
             <WrapperHeader gutter={16}>
-                <Col span={6}>
+                <Col span={6} onClick={() => navigate('/')}
+                    style={{ cursor: 'pointer' }}>
                     <WrapperText>Plant indoor</WrapperText>
                 </Col>
 
@@ -45,16 +66,24 @@ const HeaderComponent = () => {
                 </Col>
 
                 <Col span={6} style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-                    <div onClick={handleRedirect} style={{ cursor: 'pointer' }}>
+                    <div style={{ cursor: 'pointer' }}>
                         <WrapperHeaderAccount>
                             <UserOutlined style={{ fontSize: '30px' }} />
-                            <div>
-                                <span>Đăng ký / Đăng nhập</span>
-                                <div>
-                                    <span>Tài khoản</span>
-                                    <CaretDownOutlined />
+                            {user?.User_Fullname ? (
+                                <>
+                                    <Popover content={content} trigger='click'>
+                                        <div>{user.User_Fullname}</div>
+                                    </Popover>
+                                </>
+                            ) : (
+                                <div onClick={handleRedirect}>
+                                    <span>Đăng ký / Đăng nhập</span>
+                                    <div>
+                                        <span>Tài khoản</span>
+                                        <CaretDownOutlined />
+                                    </div>
                                 </div>
-                            </div>
+                            )}
                         </WrapperHeaderAccount>
                     </div>
 

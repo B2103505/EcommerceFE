@@ -28,3 +28,16 @@ font-size: 13px;
 color: #fff;
 white-space: nowrap;
 `
+
+export const WrapperTextPopupUser = styled.p`
+font-size: 14px;
+white-space: nowrap;
+cursor: pointer;
+margin: 3px;
+padding: 3px;
+&:hover {
+    background: blue;
+    color: #fff;
+    border-radius: 5px
+}
+`
