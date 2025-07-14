@@ -16,7 +16,7 @@ import { isJsonString } from './utils';
 import { jwtDecode } from 'jwt-decode';
 import * as UserService from './Service/UserService'
 import { useDispatch, useSelector } from 'react-redux';
-import { updateUser } from './redux/slice/userSlice';
+import { updateUser, resetUser } from './redux/slice/userSlice';
 
 function App() {
 
@@ -30,28 +30,78 @@ function App() {
     }
   }, [])
 
-  const handleDecoded = () => {
-    let storeData = localStorage.getItem('access_token')
-    let decoded = {}
+  // const handleDecoded = () => {
+  //   let storeData = localStorage.getItem('access_token')
+  //   let decoded = {}
 
-    if (storeData && isJsonString(storeData)) {
-      storeData = JSON.parse(storeData)
-      decoded = jwtDecode(storeData)
+  //   if (storeData && isJsonString(storeData)) {
+  //     storeData = JSON.parse(storeData)
+  //     decoded = jwtDecode(storeData)
+  //   }
+  //   return { decoded, storeData }
+  // }
+
+  const handleDecoded = () => {
+    const token = localStorage.getItem('access_token');
+    if (token && isJsonString(token)) {
+      const parsedToken = JSON.parse(token);
+      try {
+        const decoded = jwtDecode(parsedToken);
+        return { decoded, storeData: parsedToken };
+      } catch (err) {
+        console.error('Invalid token:', err);
+        return { decoded: null, storeData: null };
+      }
     }
-    return { decoded, storeData }
+    return { decoded: null, storeData: null };
+  };
+
+
+  // UserService.axiosJWT.interceptors.request.use(async (config) => {
+  //   const currTime = new Date()
+  //   const { decoded } = handleDecoded()
+  //   if (decoded?.exp < currTime.getTime() / 1000) {
+  //     const data = await UserService.refreshToken()
+  //     config.headers['authorization'] = `Bearer ${data?.access_token}`
+  //   }
+  //   return config;
+  // }, function (error) {
+  //   return Promise.reject(error)
+  // })
+
+  const handleLogout = async () => {
+    // setLoading(true)
+    await UserService.LogoutUser()
+    localStorage.removeItem('access_token');
+    dispatch(resetUser())
+    // setLoading(false)
   }
 
-  UserService.axiosJWT.interceptors.request.use(async (config) => {
-    const currTime = new Date()
-    const { decoded } = handleDecoded()
-    if (decoded?.exp < currTime.getTime() / 1000) {
-      const data = await UserService.refreshToken()
-      config.headers['authorization'] = `Bearer ${data?.access_token}`
+  UserService.axiosJWT.interceptors.request.use(
+    async (config) => {
+      const currTime = new Date();
+      const { decoded, storeData } = handleDecoded();
+
+      if (decoded && decoded.exp < currTime.getTime() / 1000) {
+        try {
+          const data = await UserService.refreshToken();
+          if (data?.access_token) {
+            localStorage.setItem('access_token', JSON.stringify(data.access_token));
+            config.headers['authorization'] = `Bearer ${data.access_token}`;
+          }
+        } catch (err) {
+          console.error('Refresh token failed:', err);
+          handleLogout()
+        }
+      }
+
+      return config;
+    },
+    function (error) {
+      return Promise.reject(error);
     }
-    return config;
-  }, function (error) {
-    return Promise.reject(error)
-  })
+  );
+
 
   const handleGetDetailsUser = async (id, token) => {
     if (!id || !token) return;

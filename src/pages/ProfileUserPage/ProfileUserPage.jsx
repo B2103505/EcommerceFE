@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useSelector, useDispatch } from 'react-redux';
 import { Form, Input, Button, Avatar, message } from 'antd';
@@ -15,6 +15,7 @@ const UserProfilePage = () => {
     const user = useSelector(state => state.user);
     const mutation = useMutationHooks(({ User_Id, data, access_token }) => UserService.updateUser(User_Id, data, access_token));
     const { data } = mutation
+    const [avatarUrl, setAvatarUrl] = useState('');
 
     const handleUploadAvatar = async (e) => {
         const file = e.target.files[0];
@@ -22,23 +23,25 @@ const UserProfilePage = () => {
 
         try {
             const url = await uploadImageToCloudinary(file);
-            form.setFieldsValue({ User_Avatar: url }); // Gán URL trả về vào form
+            form.setFieldsValue({ User_Avatar: url });
+            setAvatarUrl(url); // ✅ cập nhật avatar mới
             toast.success('Tải ảnh thành công!');
         } catch (err) {
-            console.error('Upload error:', err);
             toast.error('Tải ảnh thất bại!');
         }
     };
 
     useEffect(() => {
-        // Đổ dữ liệu cũ vào form
         form.setFieldsValue({
             User_Fullname: user.User_Fullname,
             User_PhoneNumber: user.User_PhoneNumber,
             User_Avatar: user.User_Avatar,
             User_Address: user.User_Address,
         });
+
+        setAvatarUrl(user.User_Avatar || '');
     }, [user, form]);
+
 
     const handleUpdate = async (values) => {
         // mutation.mutate({ User_Id: user?.User_Id, data: values });
@@ -59,6 +62,8 @@ const UserProfilePage = () => {
         );
     };
 
+    console.log('user', user)
+
     return (
         <PageWrapper>
             <ProfileWrapper>
@@ -67,7 +72,7 @@ const UserProfilePage = () => {
                 <div style={{ textAlign: 'center', marginBottom: 20 }}>
                     <Avatar
                         size={100}
-                        src={form.getFieldValue('User_Avatar') || 'https://via.placeholder.com/150'}
+                        src={avatarUrl || 'https://via.placeholder.com/150'}
                     />
                 </div>
 

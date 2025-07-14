@@ -27,6 +27,7 @@ const HeaderComponent = () => {
         await UserService.LogoutUser()
         localStorage.removeItem('access_token');
         dispatch(resetUser())
+        navigate('/');
         // setLoading(false)
     }
 
@@ -38,6 +39,9 @@ const HeaderComponent = () => {
     const content = () => {
         return (
             <div>
+                {user?.isPermis && (
+                    <WrapperTextPopupUser onClick={() => navigate('/system/admin')}>Quản lý hệ thống</WrapperTextPopupUser>
+                )}
                 <WrapperTextPopupUser onClick={handleGetDetail}>Thông tin người dùng</WrapperTextPopupUser>
                 <WrapperTextPopupUser onClick={handleLogout}>Đăng xuất</WrapperTextPopupUser>
             </div>

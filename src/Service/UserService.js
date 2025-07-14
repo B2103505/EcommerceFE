@@ -51,3 +51,32 @@ export const updateUser = async (id, data, access_token) => {
     })
     return res.data
 }
+
+export const getAllUser = async (page = 1, limit = 5, access_token) => {
+    const res = await axiosJWT.get(`${process.env.REACT_APP_API_KEY}/user/getAll?page=${page}&limit=${limit}`, {
+        headers: {
+            authorization: `Bearer ${access_token}`,
+        }
+    });
+    return res.data;
+};
+
+export const deleteUser = async (id, access_token) => {
+    const res = await axiosJWT.delete(`${process.env.REACT_APP_API_KEY}/user/delete-user/${id}`, {
+        headers: {
+            authorization: `Bearer ${access_token}`,
+        }
+    });
+    return res.data;
+};
+
+
+export const createUser = async (data, access_token) => {
+    const res = await axios.post(`${process.env.REACT_APP_API_KEY}/user/sign-up`, data, {
+        headers: {
+            'Content-Type': 'application/json',
+            authorization: `Bearer ${access_token}`, // Nếu backend yêu cầu
+        }
+    });
+    return res.data;
+};
