@@ -18,6 +18,8 @@ const renderPage = (key) => {
     }
 }
 
+
+
 const items = [
     { key: '1', icon: <PieChartOutlined />, label: 'Tổng quan' },
     {
@@ -29,10 +31,6 @@ const items = [
         key: 'plant',
         label: 'Quản lý sản phẩm',
         icon: <AppstoreOutlined />,
-        children: [
-            { key: '9', label: 'Danh sách sản phẩm' },
-            { key: '10', label: 'Thêm sản phẩm' },
-        ],
     },
 ];
 
@@ -75,10 +73,6 @@ const AdminPage = () => {
                 <h2>Nội dung đang chọn: {keySelected}</h2>
                 <div>
                     {keySelected === '1' && <p>📊 Đây là Dashboard tổng quan</p>}
-                    {keySelected === '5' && <p>👥 Danh sách người dùng</p>}
-                    {keySelected === '6' && <p>🔐 Phân quyền người dùng</p>}
-                    {keySelected === '9' && <p>🪴 Danh sách sản phẩm</p>}
-                    {keySelected === '10' && <p>Thêm sản phẩm mới</p>}
                     {renderPage(keySelected)}
                 </div>
             </div>
