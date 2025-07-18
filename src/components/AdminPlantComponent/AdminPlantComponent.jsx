@@ -5,7 +5,7 @@ import {
 import {
     PlusOutlined, UploadOutlined, DeleteOutlined
 } from "@ant-design/icons";
-// import { getAllCategory } from "../../Service/CategoryService";
+import { getAllCategory } from "../../Service/CategoryService";
 import {
     createPlant, updatePlant, deletePlant, getAllPlant
 } from "../../Service/PlantService";
@@ -13,6 +13,8 @@ import { uploadImageToCloudinary } from "../../utils/CloudinaryUpload";
 import { toast } from "react-toastify";
 import AdminPlantComponent from "../../components/AdminPlantComponent/AdminPlantComponent";
 import { useSelector } from "react-redux";
+import MDEditor from '@uiw/react-md-editor';
+import { getValidDiscounts } from '../../Service/DiscountService'
 
 const { Option } = Select;
 
@@ -34,7 +36,35 @@ const AdminPlantPage = () => {
     const user = useSelector(state => state.user);
     const access_token = user?.access_token || localStorage.getItem("access_token");
     const [filterField, setFilterField] = useState("Plant_Name");
+    const [description, setDescription] = useState("");
+    const [discounts, setDiscounts] = useState([]);
 
+    const leafShapes = [
+        "Lá kim", "Lá tròn", "Lá dài", "Lá xoăn", "Lá trái tim", "Lá dẻ quạt",
+        "Lá mác", "Lá bầu dục", "Lá hình thoi", "Lá chẻ", "Lá hình chân vịt"
+    ];
+    const leafColors = [
+        "Xanh đậm", "Xanh nhạt", "Xanh sọc", "Xanh vàng", "Xanh lục",
+        "Xanh ánh bạc", "Xanh tím", "Xanh pha đỏ", "Xanh ánh đồng", "Xanh rêu"
+    ];
+    const growthForms = [
+        "Thẳng đứng", "Rủ xuống", "Dạng bụi", "Leo", "Tán rộng", "Dạng rosette (hoa thị)",
+        "Thân bò", "Thân đứng", "Tán ô", "Dạng thân thảo"
+    ];
+    const plantSizes = [
+        "Rất nhỏ (mini)", "Nhỏ", "Trung bình", "Lớn", "Rất lớn (trên 2m)"
+    ];
+    const suitableSpaces = [
+        "Bàn làm việc", "Phòng khách", "Ban công", "Hành lang", "Phòng ngủ",
+        "Nhà tắm", "Cửa sổ", "Kệ sách", "Quán cà phê", "Văn phòng", "Tiền sảnh"
+    ];
+    const suitableLights = [
+        "Ánh sáng trực tiếp", "Ánh sáng gián tiếp", "Bóng râm", "Ánh sáng yếu",
+        "Gần cửa sổ", "Dưới đèn huỳnh quang", "Ánh sáng buổi sáng", "Ánh sáng tán xạ"
+    ];
+    const foliageDensities = [
+        "Rất thưa", "Thưa", "Trung bình", "Dày", "Rất dày", "Siêu rậm rạp"
+    ];
     const fetchPlants = async (params = { page: 1, limit: 8 }) => {
         setLoading(true);
         const res = await getAllPlant(params);
@@ -49,15 +79,39 @@ const AdminPlantPage = () => {
         setLoading(false);
     };
 
-    // const fetchCategories = async () => {
-    //     const res = await getAllCategory();
-    //     if (res?.status === "OK") setCategories(res.data);
-    // };
-
     useEffect(() => {
-        fetchPlants({ page: 1, limit: 8 });
-        // fetchCategories();
+        const fetchInitialData = async () => {
+            try {
+                await fetchPlants({ page: 1, limit: 8 });
+
+                const [categoryRes, discountRes] = await Promise.all([
+                    getAllCategory(),
+                    getValidDiscounts()
+                ]);
+
+                console.log("categoryRes", categoryRes);
+                console.log("discountRes", discountRes);
+
+                if (categoryRes?.status === "OK") {
+                    setCategories(categoryRes.data);
+                } else {
+                    toast.error("Lỗi tải danh mục");
+                }
+
+                if (discountRes?.status === "OK") {
+                    setDiscounts(discountRes.data);
+                } else {
+                    toast.error("Lỗi tải mã giảm giá");
+                }
+
+            } catch (error) {
+                console.error("Lỗi khi fetch dữ liệu ban đầu:", error);
+            }
+        };
+
+        fetchInitialData();
     }, []);
+
 
     const handleTableChange = (pagination) => {
         fetchPlants({
@@ -72,10 +126,16 @@ const AdminPlantPage = () => {
         setIsModalOpen(true);
         if (record) {
             setEditingPlantId(record._id);
-            form.setFieldsValue(record);
+            setDescription(record.Plant_Description || "");
+            form.setFieldsValue({
+                ...record,
+                Category_Id: Array.isArray(record.Category_Id) ? record.Category_Id : [record.Category_Id],
+                Discount_Ids: Array.isArray(record.Discount_Ids) ? record.Discount_Ids : []
+            });
             setPreviewImages(record.Plant_Images || []);
         } else {
             form.resetFields();
+            setDescription("");
             setPreviewImages([]);
             setEditingPlantId(null);
         }
@@ -109,8 +169,11 @@ const AdminPlantPage = () => {
             const values = await form.validateFields();
             const finalData = {
                 ...values,
-                Plant_Images: previewImages
+                Plant_Images: previewImages,
+                Plant_Description: description
             };
+
+            setIsModalOpen(false);
 
             const res = editingPlantId
                 ? await updatePlant(editingPlantId, finalData, access_token)
@@ -215,7 +278,7 @@ const AdminPlantPage = () => {
                 onCancel={() => setIsModalOpen(false)}
                 onOk={handleSubmit}
                 width={600}
-                destroyOnClose
+                destroyOnHidden
             >
 
                 <Form layout="vertical" form={form}>
@@ -228,30 +291,77 @@ const AdminPlantPage = () => {
                     <Form.Item name="Plant_Other_Name" label="Tên gọi khác">
                         <Input />
                     </Form.Item>
+
                     <Form.Item name="Plant_Leaf_Shape" label="Hình dáng lá">
-                        <Input />
+                        <Select placeholder="Chọn hình dáng lá">
+                            {leafShapes.map(shape => (
+                                <Option key={shape} value={shape}>{shape}</Option>
+                            ))}
+                        </Select>
                     </Form.Item>
+
                     <Form.Item name="Plant_Leaf_Color" label="Màu lá">
-                        <Input />
+                        <Select placeholder="Chọn màu lá">
+                            {leafColors.map(color => (
+                                <Option key={color} value={color}>{color}</Option>
+                            ))}
+                        </Select>
                     </Form.Item>
+
                     <Form.Item name="Plant_Growth_Form" label="Dáng cây">
-                        <Input />
+                        <Select placeholder="Chọn dáng cây">
+                            {growthForms.map(form => (
+                                <Option key={form} value={form}>{form}</Option>
+                            ))}
+                        </Select>
                     </Form.Item>
+
                     <Form.Item name="Plant_Size" label="Kích thước">
-                        <Input />
+                        <Select placeholder="Chọn kích thước">
+                            {plantSizes.map(size => (
+                                <Option key={size} value={size}>{size}</Option>
+                            ))}
+                        </Select>
                     </Form.Item>
+
                     <Form.Item name="Plant_Context" label="Không gian phù hợp">
-                        <Input />
+                        <Select placeholder="Chọn không gian">
+                            {suitableSpaces.map(space => (
+                                <Option key={space} value={space}>{space}</Option>
+                            ))}
+                        </Select>
                     </Form.Item>
+
                     <Form.Item name="Plant_Light" label="Ánh sáng phù hợp">
-                        <Input />
+                        <Select placeholder="Chọn ánh sáng">
+                            {suitableLights.map(light => (
+                                <Option key={light} value={light}>{light}</Option>
+                            ))}
+                        </Select>
                     </Form.Item>
+
                     <Form.Item name="Plant_Foliage_Density" label="Mật độ tán lá">
-                        <Input />
+                        <Select placeholder="Chọn mật độ tán lá">
+                            {foliageDensities.map(densi => (
+                                <Option key={densi} value={densi}>{densi}</Option>
+                            ))}
+                        </Select>
                     </Form.Item>
-                    <Form.Item name="Plant_Description" label="Mô tả" rules={[{ required: true }]}>
-                        <Input.TextArea rows={4} />
+
+                    <Form.Item
+                        label="Mô tả"
+                        name="Plant_Description"
+                        rules={[{ required: true, message: "Vui lòng nhập mô tả" }]}
+                    >
+                        <div data-color-mode="light">
+                            <MDEditor
+                                value={description}
+                                onChange={setDescription}
+                                height={300}
+                            />
+                        </div>
                     </Form.Item>
+
                     <Form.Item name="Plant_Price" label="Giá (VND)" rules={[{ required: true }]}>
                         <InputNumber min={0} style={{ width: "100%" }} />
                     </Form.Item>
@@ -264,12 +374,34 @@ const AdminPlantPage = () => {
                             <Select.Option value="unavailable">Hết hàng</Select.Option>
                         </Select>
                     </Form.Item>
-                    <Form.Item name="Category_Id" label="Danh mục">
-                        <Select placeholder="Chọn danh mục">
+                    <Form.Item name="Category_Ids" label="Danh mục">
+                        <Select
+                            mode="multiple"
+                            placeholder="Chọn danh mục"
+                        >
                             {categories.map(cat => (
-                                <Select.Option key={cat._id} value={cat._id}>
+                                <Option key={cat._id} value={cat._id}>
                                     {cat.Category_Name}
-                                </Select.Option>
+                                </Option>
+                            ))}
+                        </Select>
+                    </Form.Item>
+
+                    <Form.Item name="Discount_Ids" label="Mã giảm giá áp dụng">
+                        <Select
+                            mode="multiple"
+                            placeholder="Chọn mã giảm giá"
+                            optionLabelProp="label"
+                            allowClear
+                        >
+                            {discounts.map(discount => (
+                                <Option
+                                    key={discount._id}
+                                    value={discount._id}
+                                    label={discount.Discount_Name}
+                                >
+                                    {discount.Discount_Name} - Giảm {discount.Discount_Value}%
+                                </Option>
                             ))}
                         </Select>
                     </Form.Item>

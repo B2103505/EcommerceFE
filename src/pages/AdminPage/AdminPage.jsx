@@ -9,19 +9,21 @@ import { Button, Menu } from 'antd';
 import React, { useState } from "react";
 import AdminUserComponent from '../../components/AdminUserComponent/AdminUserComponent';
 import AdminPlantComponent from '../../components/AdminPlantComponent/AdminPlantComponent';
+import AdminCategoryComponent from '../../components/AdminCategoryComponent/AdminCategoryComponent';
+import AdminDiscountCom from '../../components/AdminDiscountCom/AdminDiscountCom';
 
 const renderPage = (key) => {
     switch (key) {
         case 'user': return (<AdminUserComponent />)
         case 'plant': return (<AdminPlantComponent />)
+        case 'category': return (<AdminCategoryComponent />)
+        case 'discount': return (<AdminDiscountCom />)
         default: return (<></>)
     }
 }
 
-
-
 const items = [
-    { key: '1', icon: <PieChartOutlined />, label: 'Tổng quan' },
+    { key: 'system', icon: <PieChartOutlined />, label: 'Tổng quan' },
     {
         key: 'user',
         label: 'Quản lý người dùng',
@@ -32,18 +34,28 @@ const items = [
         label: 'Quản lý sản phẩm',
         icon: <AppstoreOutlined />,
     },
+    {
+        key: 'category',
+        label: 'Quản lý danh mục',
+        icon: <AppstoreOutlined />,
+    },
+    {
+        key: 'discount',
+        label: 'Quản lý giảm giá',
+        icon: <AppstoreOutlined />,
+    },
 ];
 
 const AdminPage = () => {
     const [collapsed, setCollapsed] = useState(false);
-    const [keySelected, setKeySelected] = useState('1');
+    const [keySelected, setKeySelected] = useState('system');
 
     const toggleCollapsed = () => {
         setCollapsed(!collapsed);
     };
 
     const handleOnClick = ({ key }) => {
-        setKeySelected(key); // ✅ cập nhật state
+        setKeySelected(key);
     };
 
     return (
@@ -58,7 +70,7 @@ const AdminPage = () => {
                     {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
                 </Button>
                 <Menu
-                    defaultSelectedKeys={['1']}
+                    defaultSelectedKeys={['system']}
                     defaultOpenKeys={['user']}
                     mode="inline"
                     theme="dark"
@@ -72,7 +84,7 @@ const AdminPage = () => {
             <div style={{ flex: 1, padding: 20 }}>
                 <h2>Nội dung đang chọn: {keySelected}</h2>
                 <div>
-                    {keySelected === '1' && <p>📊 Đây là Dashboard tổng quan</p>}
+                    {keySelected === 'system' && <p>📊 Đây là Dashboard tổng quan</p>}
                     {renderPage(keySelected)}
                 </div>
             </div>
