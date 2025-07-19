@@ -51,6 +51,10 @@ const HeaderComponent = () => {
         navigate('/sign-in');
     };
 
+    const handleCart = () => {
+        navigate('/cart');
+    };
+
     return (
         <div>
             <WrapperHeader gutter={16}>
@@ -91,7 +95,9 @@ const HeaderComponent = () => {
                         </WrapperHeaderAccount>
                     </div>
 
-                    <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', gap: '5px', alignItems: 'center', cursor: 'pointer' }}
+                        onClick={handleCart}
+                    >
                         <Badge count={4} size="small">
                             <ShoppingCartOutlined style={{ fontSize: '30px', color: '#fff' }} />
                         </Badge>

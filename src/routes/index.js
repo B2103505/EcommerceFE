@@ -9,6 +9,7 @@ import ProfileUserPage from "../pages/ProfileUserPage/ProfileUserPage";
 import SignInPage from "../pages/SignInPage/SignInPage";
 import SignUpPage from "../pages/SignUpPage/SignUpPage";
 import AdminPage from '../pages/AdminPage/AdminPage'
+import CartPage from "../pages/CartPage/CartPage";
 
 export const routes = [
     {
@@ -47,7 +48,7 @@ export const routes = [
         isShowHeader: false
     },
     {
-        path: '/detail-product',
+        path: '/detail-product/:id',
         page: DetailProductPage,
         isShowHeader: true
     },
@@ -61,6 +62,11 @@ export const routes = [
         page: AdminPage,
         isShowHeader: true,
         isPrivate: true
+    },
+    {
+        path: '/cart',
+        page: CartPage,
+        isShowHeader: true
     },
     {
         path: '*',

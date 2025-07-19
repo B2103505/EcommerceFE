@@ -34,17 +34,10 @@ export const updatePlant = async (id, plantData, access_token) => {
     return res.data;
 };
 
-export const getDetailPlant = async (id, access_token) => {
-    const res = await axiosJWT.get(
-        `${API_URL}/plant/detail/${id}`,
-        {
-            headers: {
-                Authorization: `Bearer ${access_token}`
-            }
-        }
-    );
+export const getDetailPlant = async (id) => {
+    const res = await axios.get(`${API_URL}/plant/detail/${id}`);
     return res.data;
-};
+  };
 
 export const deletePlant = async (id, access_token) => {
     const res = await axiosJWT.delete(

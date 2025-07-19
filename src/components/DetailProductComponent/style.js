@@ -36,7 +36,7 @@ export const WrapperAddress = styled.div`
         line-height: 24px;
         font-weight: 500;
         white-space: nowrap;
-        overflow: hidden;
+
         text-overflow: ellipsis;
     },
     span.change-address{

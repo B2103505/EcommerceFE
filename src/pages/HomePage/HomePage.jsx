@@ -19,7 +19,7 @@ const HomePage = () => {
         queryKey: ['Plant'],
         queryFn: fetchAllPlant,
     })
-    console.log('data', plants)
+    // console.log('data', plants)
 
     return (
         <>

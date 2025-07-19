@@ -1,16 +1,30 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { StyleNameProduct, WrapperCardStyle, WrapperDiscountProduct, WrapperPriceProduct, WrapperRateProduct } from "./style";
 import { StarFilled } from '@ant-design/icons';
+
 const CardComponent = ({ data }) => {
+    const navigate = useNavigate();
+
+    const handleClick = () => {
+        if (data?._id) {
+            navigate(`/detail-product/${data._id}`);
+        }
+    };
+
     return (
         <WrapperCardStyle
             hoverable
-            style={{ width: 200 }}
+            onClick={handleClick}
+            style={{ width: 200, cursor: 'pointer' }}
             styles={{ body: { padding: 10 } }}
             cover={
-                <img alt={data?.Plant_Name || "Hình ảnh cây"}
-                    src={data?.Plant_Image || "https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png"} />}>
-
+                <img
+                    alt={data?.Plant_Name || "Hình ảnh cây"}
+                    src={data?.Plant_Images?.[0] || "https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png"}
+                />
+            }
+        >
             <StyleNameProduct>{data?.Plant_Name}</StyleNameProduct>
             <WrapperRateProduct>
                 <span style={{ marginRight: '15px' }}>
@@ -28,7 +42,7 @@ const CardComponent = ({ data }) => {
                 </WrapperDiscountProduct>
             </WrapperPriceProduct>
         </WrapperCardStyle>
-    )
-}
+    );
+};
 
 export default CardComponent;
