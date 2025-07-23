@@ -53,13 +53,11 @@ const CartPage = () => {
     useEffect(() => {
         if (userId) fetchCart();
     }, [userId]);
-    console.log('cartItems:', cartItems);
+    // console.log('cartItems:', cartItems);
     return (
         <div style={{ padding: '20px 120px' }}>
 
             <Title level={2}>Giỏ hàng của bạn</Title>
-
-            {/* Đường kẻ ngang dưới tiêu đề */}
             <div style={{ borderBottom: '1px solid #ccc', margin: '16px 0' }} />
 
             {loading ? (

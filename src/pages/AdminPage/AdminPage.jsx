@@ -60,7 +60,6 @@ const AdminPage = () => {
 
     return (
         <div style={{ display: 'flex', height: '100vh' }}>
-            {/* Sidebar */}
             <div style={{ width: collapsed ? 80 : 256, background: '#001529', padding: 10 }}>
                 <Button
                     type="primary"

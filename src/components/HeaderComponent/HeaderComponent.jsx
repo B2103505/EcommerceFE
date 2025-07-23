@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from 'react';
 import { Badge, Col, Popover } from 'antd'
 import {
     WrapperHeader, WrapperText,
@@ -15,12 +15,60 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux";
 import * as UserService from '../../Service/UserService'
 import { resetUser } from '../../redux/slice/userSlice'
+import { getCartByUserId } from '../../Service/CartService'
 
 const HeaderComponent = () => {
     const navigate = useNavigate();
     const user = useSelector((state) => state.user)
     const dispatch = useDispatch()
-    // const { Loading, setLoading } = useState(false)
+    const [cartCount, setCartCount] = useState(0);
+    const userId = useSelector(state => state.user.User_Id);
+    console.log('user', userId)
+
+    // useEffect(() => {
+    //     const fetchCart = async () => {
+    //         try {
+    //             if (!userId) return;
+    //             const res = await getCartByUserId(userId);
+    //             if (res?.status === 'OK' && Array.isArray(res.data)) {
+    //                 const totalQty = res.data.reduce((sum, item) => {
+    //                     return sum + Number(item.Cart_Item_Quantity);
+    //                 }, 0);
+    //                 setCartCount(totalQty);
+    //             }
+    //         } catch (err) {
+    //             console.error('Error fetching cart:', err);
+    //         }
+    //     };
+
+    //     fetchCart();
+    // }, [userId]);
+
+    useEffect(() => {
+        const fetchCart = async () => {
+            if (!userId) return;
+            const res = await getCartByUserId(userId);
+            if (res?.status === 'OK' && Array.isArray(res.data)) {
+                const totalQty = res.data.reduce((sum, item) => sum + Number(item.Cart_Item_Quantity), 0);
+                setCartCount(totalQty);
+            }
+        };
+
+        const handleCartChange = () => {
+            fetchCart();
+        };
+
+        window.addEventListener('cartUpdated', handleCartChange);
+
+        // Initial fetch
+        if (userId) {
+            fetchCart();
+        }
+
+        return () => {
+            window.removeEventListener('cartUpdated', handleCartChange);
+        };
+    }, [userId]);
 
     const handleLogout = async () => {
         // setLoading(true)
@@ -95,14 +143,16 @@ const HeaderComponent = () => {
                         </WrapperHeaderAccount>
                     </div>
 
-                    <div style={{ display: 'flex', gap: '5px', alignItems: 'center', cursor: 'pointer' }}
+                    <div
+                        style={{ display: 'flex', gap: '5px', alignItems: 'center', cursor: 'pointer' }}
                         onClick={handleCart}
                     >
-                        <Badge count={4} size="small">
+                        <Badge count={cartCount} size="small" showZero>
                             <ShoppingCartOutlined style={{ fontSize: '30px', color: '#fff' }} />
                         </Badge>
                         <WrapperTextSmall>Giỏ hàng</WrapperTextSmall>
                     </div>
+
                 </Col>
             </WrapperHeader>
         </div>

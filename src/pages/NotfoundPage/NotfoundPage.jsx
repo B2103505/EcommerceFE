@@ -1,9 +1,24 @@
-import React from "react";
+import React, { useState } from "react";
+import MapAddressCom from "../../components/MapAddressCom/MapAddressCom";
 
 const NotfoundPage = () => {
-    return(
-        <div>NotfoundPage</div>
-    )
-}
+    const [latitude, setLatitude] = useState(null);
+    const [longitude, setLongitude] = useState(null);
+
+    return (
+        <div>
+            <MapAddressCom
+                onSelect={({ lat, lng }) => {
+                    setLatitude(lat);
+                    setLongitude(lng);
+                }}
+            />
+            <div style={{ marginTop: 20 }}>
+                <p><strong>Latitude:</strong> {latitude}</p>
+                <p><strong>Longitude:</strong> {longitude}</p>
+            </div>
+        </div>
+    );
+};
 
 export default NotfoundPage;

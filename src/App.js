@@ -17,6 +17,7 @@ import { jwtDecode } from 'jwt-decode';
 import * as UserService from './Service/UserService'
 import { useDispatch, useSelector } from 'react-redux';
 import { updateUser, resetUser } from './redux/slice/userSlice';
+import 'leaflet/dist/leaflet.css';
 
 function App() {
 

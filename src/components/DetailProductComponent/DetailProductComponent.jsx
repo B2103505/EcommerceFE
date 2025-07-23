@@ -54,7 +54,7 @@ const DetailProductComponent = ({ data }) => {
                 Plant_Id: data._id,
                 quantity,
             });
-
+            window.dispatchEvent(new Event('cartUpdated'));
             if (res.status !== 'ERROR') {
                 toast.success('🛒 Đã thêm sản phẩm vào giỏ hàng!');
             } else {

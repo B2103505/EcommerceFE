@@ -24,6 +24,7 @@ const CartItem = ({ cartItems, refreshCart, onDiscountChange }) => {
     const handleQuantityChange = async (itemId, newQty) => {
         try {
             await updateCartItem({ cartItemId: itemId, quantity: newQty });
+            window.dispatchEvent(new Event('cartUpdated'));
             refreshCart();
         } catch {
             message.error('Lỗi cập nhật số lượng');
@@ -33,6 +34,7 @@ const CartItem = ({ cartItems, refreshCart, onDiscountChange }) => {
     const handleDelete = async (itemId) => {
         try {
             await deleteCartItem(itemId);
+            window.dispatchEvent(new Event('cartUpdated'));
             refreshCart();
         } catch {
             message.error('Lỗi xóa sản phẩm');

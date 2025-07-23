@@ -52,6 +52,17 @@ export const updateUser = async (id, data, access_token) => {
     return res.data
 }
 
+export const createAddress = async (data) => {
+    const res = await axios.post(`${process.env.REACT_APP_API_KEY}/address/create`, data);
+    return res.data;
+};
+
+export const getAddressByUserId = async (userId) => {
+    const res = await axios.get(`${process.env.REACT_APP_API_KEY}/address/get/${userId}`);
+    return res.data;
+};
+
+
 export const getAllUser = async (page = 1, limit = 5, access_token) => {
     const res = await axiosJWT.get(`${process.env.REACT_APP_API_KEY}/user/getAll?page=${page}&limit=${limit}`, {
         headers: {
@@ -80,3 +91,16 @@ export const createUser = async (data, access_token) => {
     });
     return res.data;
 };
+
+export const getAllOrderStatuses = async () => {
+    return await axios.get(`${process.env.REACT_APP_API_KEY}/user/order-status`);
+};
+
+export const getAllPaymentMethods = async () => {
+    return await axios.get(`${process.env.REACT_APP_API_KEY}/user/payment-methods`);
+};
+
+export const getAllPaymentStatuses = async () => {
+    return await axios.get(`${process.env.REACT_APP_API_KEY}/user/payment-status`);
+};
+

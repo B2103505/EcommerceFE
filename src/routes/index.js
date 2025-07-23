@@ -28,7 +28,7 @@ export const routes = [
         isShowHeader: true
     },
     {
-        path: '/:cate',
+        path: '/cate/:id',
         page: CategoryPage,
         isShowHeader: true
     },
