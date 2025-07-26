@@ -1,41 +1,62 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useParams } from 'react-router-dom';
+import { Col, Pagination, Row } from "antd";
 import NavBarComponent from "../../components/NavBarComponent/NavBarComponent";
 import CardComponent from "../../components/CardComponent/CardComponent";
-import { Col, Pagination, Row } from "antd";
 import { WrapperNavBar, WrapperProduct } from "./style";
+import { fetchPlantsByCategory } from '../../Service/PlantService'
 
-const CategoryPage = ({ children }) => {
+const CategoryPage = () => {
+    const { id: categoryId } = useParams();
+    const [products, setProducts] = useState([]);
+    const [total, setTotal] = useState(0);
+    const [page, setPage] = useState(1);
 
-    const onChange = () => {
+    const fetchData = async () => {
+        try {
+            const res = await fetchPlantsByCategory(categoryId, page, 10);
+            setProducts(res.data.plants);
+            setTotal(res.data.total);
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
-    }
+    useEffect(() => {
+        fetchData();
+    }, [categoryId, page]);
+
+    const handleChangePage = (pageNumber) => {
+        setPage(pageNumber);
+    };
 
     return (
         <div style={{ padding: '0 120px', background: '#efefef' }}>
             <Row style={{ flexWrap: 'nowrap', paddingTop: '20px' }}>
-                <WrapperNavBar span={4}>
-                    <NavBarComponent />
-                </WrapperNavBar>
+
                 <Col span={20}>
                     <WrapperProduct>
-                        <CardComponent />
-                        <CardComponent />
-                        <CardComponent />
-                        <CardComponent />
-                        <CardComponent />
-                        <CardComponent />
-                        <CardComponent />
-                        <CardComponent />
+                        <Row gutter={[16, 16]}>
+                            {products.map((product) => (
+                                <Col span={6} key={product._id}>
+                                    <CardComponent data={product} />
+                                </Col>
+                            ))}
+                        </Row>
+                        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+                            <Pagination
+                                showQuickJumper
+                                current={page}
+                                total={total}
+                                pageSize={10}
+                                onChange={handleChangePage}
+                            />
+                        </div>
                     </WrapperProduct>
-                    <Pagination showQuickJumper defaultCurrent={2}
-                        total={100} onChange={onchange}
-                        style={{ justifyContent: 'center', marginTop: '10px' }}
-                    />
                 </Col>
             </Row>
-
         </div>
-    )
-}
+    );
+};
 
 export default CategoryPage;

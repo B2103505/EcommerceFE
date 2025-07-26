@@ -100,8 +100,6 @@ const UserProfilePage = () => {
         );
     };
 
-    // console.log('user', user)
-
     return (
         <PageWrapper>
             <ProfileWrapper>

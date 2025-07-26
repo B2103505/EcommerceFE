@@ -65,6 +65,7 @@ const AdminPlantPage = () => {
     const foliageDensities = [
         "Rất thưa", "Thưa", "Trung bình", "Dày", "Rất dày", "Siêu rậm rạp"
     ];
+    
     const fetchPlants = async (params = { page: 1, limit: 8 }) => {
         setLoading(true);
         const res = await getAllPlant(params);
@@ -241,11 +242,11 @@ const AdminPlantPage = () => {
                 >
                     <Option value="Plant_Name">Tên cây</Option>
                     <Option value="Plant_Status">Trạng thái</Option>
-                    <Option value="Category_Id">Danh mục</Option>
+                    <Option value="Category_Ids">Danh mục</Option>
                 </Select>
 
                 <Input.Search
-                    placeholder={`Tìm kiếm theo ${filterField === "Plant_Name" ? "tên cây" : filterField === "Plant_Status" ? "trạng thái" : "danh mục"}`}
+                    placeholder={`Tìm kiếm theo ${filterField === "Plant_Name" ? "tên cây" : filterField === "Plant_Status" ? "trạng thái" : filterField === "Category_Ids"}`}
                     value={searchText}
                     onChange={(e) => setSearchText(e.target.value)}
                     onSearch={(value) => {

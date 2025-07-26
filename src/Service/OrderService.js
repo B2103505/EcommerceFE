@@ -20,6 +20,12 @@ export const deleteOrder = async (orderId) => {
     return await axios.delete(`${process.env.REACT_APP_API_KEY}/order/${orderId}`);
 };
 
-export const getAllOrders = async () => {
-    return await axios.get(`${process.env.REACT_APP_API_KEY}/order`);
+export const getAllOrders = async (filters = {}) => {
+    return await axios.get(`${process.env.REACT_APP_API_KEY}/order`, {
+        params: filters
+    });
+};
+
+export const updateOrder = async (orderId, payload) => {
+    return await axios.put(`${process.env.REACT_APP_API_KEY}/order/${orderId}`, payload);
 };

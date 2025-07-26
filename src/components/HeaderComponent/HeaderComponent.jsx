@@ -23,26 +23,6 @@ const HeaderComponent = () => {
     const dispatch = useDispatch()
     const [cartCount, setCartCount] = useState(0);
     const userId = useSelector(state => state.user.User_Id);
-    console.log('user', userId)
-
-    // useEffect(() => {
-    //     const fetchCart = async () => {
-    //         try {
-    //             if (!userId) return;
-    //             const res = await getCartByUserId(userId);
-    //             if (res?.status === 'OK' && Array.isArray(res.data)) {
-    //                 const totalQty = res.data.reduce((sum, item) => {
-    //                     return sum + Number(item.Cart_Item_Quantity);
-    //                 }, 0);
-    //                 setCartCount(totalQty);
-    //             }
-    //         } catch (err) {
-    //             console.error('Error fetching cart:', err);
-    //         }
-    //     };
-
-    //     fetchCart();
-    // }, [userId]);
 
     useEffect(() => {
         const fetchCart = async () => {
@@ -71,12 +51,10 @@ const HeaderComponent = () => {
     }, [userId]);
 
     const handleLogout = async () => {
-        // setLoading(true)
         await UserService.LogoutUser()
         localStorage.removeItem('access_token');
         dispatch(resetUser())
         navigate('/');
-        // setLoading(false)
     }
 
     const handleGetDetail = async () => {
@@ -103,6 +81,13 @@ const HeaderComponent = () => {
         navigate('/cart');
     };
 
+    const handleSearch = (keyword) => {
+        if (keyword && keyword.trim() !== '') {
+            navigate('/search', { state: { keyword: 'aaa' } });
+        }
+    };
+
+
     return (
         <div>
             <WrapperHeader gutter={16}>
@@ -118,6 +103,7 @@ const HeaderComponent = () => {
                         textBtn='Tìm kiếm'
                         backgroundInput='#fff'
                         backgroundBtn='rgb(166, 187, 211)'
+                        onSearch={handleSearch}
                     />
                 </Col>
 

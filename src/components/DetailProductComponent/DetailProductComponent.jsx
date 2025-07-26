@@ -6,7 +6,7 @@ import MarkdownIt from 'markdown-it';
 import { addToCart } from '../../Service/CartService'
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
-
+import { useNavigate } from 'react-router-dom';
 import {
     WrapperAddress,
     WrapperInputNumber,
@@ -41,6 +41,12 @@ const DetailProductComponent = ({ data }) => {
     const [mainImageIndex, setMainImageIndex] = useState(0);
     const userId = useSelector(state => state.user.User_Id);
     const defaultImage = 'https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png';
+    const navigate = useNavigate();
+
+    const handleOrder = async () => {
+        await handleAddToCart()
+        navigate('/order');
+    };
 
     const handleAddToCart = async () => {
         if (!data?._id || !quantity) {
@@ -171,6 +177,7 @@ const DetailProductComponent = ({ data }) => {
                         size={40}
                         styleBtn={{ background: 'green', color: '#fff', width: 220 }}
                         styleTextBtn={{ color: '#fff' }}
+                        onClick={handleOrder}
                     />
                     <ButtonComponent
                         textBtn="Thêm vào giỏ hàng"

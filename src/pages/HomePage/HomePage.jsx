@@ -1,6 +1,6 @@
 import React from "react";
 import TypeProduct from "../../components/TypeProduct/TypeProduct";
-import { WrapperBtnMore, WrapperProduct, WrapperTypeProduct } from "./Style";
+import { CategoryItemStyled, WrapperBtnMore, WrapperProduct, WrapperTypeProduct } from "./Style";
 import SliderComponent from "../../components/SliderComponent/SliderComponent";
 import slider1 from '../../assets/images/slider_1.webp';
 import slider2 from '../../assets/images/slider_2.webp';
@@ -9,6 +9,8 @@ import CardComponent from "../../components/CardComponent/CardComponent";
 import NavBarComponent from "../../components/NavBarComponent/NavBarComponent";
 import { useQuery } from "@tanstack/react-query";
 import * as PlantService from '../../Service/PlantService'
+import { getAllCategory } from '../../Service/CategoryService';
+import { useNavigate } from "react-router-dom";
 
 const HomePage = () => {
     const arr = ['Cây nội thất', 'Cây bonsai', 'Cây hoa cảnh', 'Cây phong thủy', 'Cây ăn quả mini', 'Chậu cây & Phụ kiện']
@@ -19,18 +21,36 @@ const HomePage = () => {
         queryKey: ['Plant'],
         queryFn: fetchAllPlant,
     })
-    // console.log('data', plants)
+
+    const navigate = useNavigate();
+
+    const fetchAllCategories = async () => {
+        const res = await getAllCategory();
+        if (res?.status === 'OK') {
+            return res.data;
+        }
+        return [];
+    }
+
+    const { data: categories } = useQuery({
+        queryKey: ['Categories'],
+        queryFn: fetchAllCategories
+    });
 
     return (
         <>
             <div style={{ padding: '0 120px' }}>
                 <WrapperTypeProduct>
-                    {arr.map((item) => {
-                        return (
-                            <TypeProduct name={item} key={item} />
-                        )
-                    })}
+                    {categories?.map((item) => (
+                        <CategoryItemStyled
+                            key={item._id}
+                            onClick={() => navigate(`/cate/${item._id}`)}
+                        >
+                            {item.Category_Name}
+                        </CategoryItemStyled>
+                    ))}
                 </WrapperTypeProduct>
+
 
             </div >
             <div id="container" style={{ backgroundColor: '#efefef', padding: '0 120px', height: '1500px' }}>
@@ -38,9 +58,9 @@ const HomePage = () => {
                 <WrapperProduct>
                     {plants?.data?.map((plant, index) => {
                         return (
-                            <CardComponent key={plant._id} 
-                            data={plant} 
-                            
+                            <CardComponent key={plant._id}
+                                data={plant}
+
                             />
                         )
                     })}
@@ -54,8 +74,6 @@ const HomePage = () => {
                         }}
                         styleTextBtn={{ fontWeight: 500 }} />
                 </div>
-
-                <NavBarComponent></NavBarComponent>
             </div>
         </>
     )

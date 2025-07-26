@@ -10,6 +10,9 @@ import SignInPage from "../pages/SignInPage/SignInPage";
 import SignUpPage from "../pages/SignUpPage/SignUpPage";
 import AdminPage from '../pages/AdminPage/AdminPage'
 import CartPage from "../pages/CartPage/CartPage";
+import OrderSuccessPage from "../pages/OrderPage/OrderSuccessPage";
+import OrderFailedPage from "../pages/OrderPage/OrderFailedPage";
+import SearchPage from "../pages/SearchPage/SearchPage";
 
 export const routes = [
     {
@@ -66,6 +69,21 @@ export const routes = [
     {
         path: '/cart',
         page: CartPage,
+        isShowHeader: true
+    },
+    {
+        path: '/order-success',
+        page: OrderSuccessPage,
+        isShowHeader: true
+    },
+    {
+        path: '/order-failed',
+        page: OrderFailedPage,
+        isShowHeader: true
+    },
+    {
+        path: '/search',
+        page: SearchPage,
         isShowHeader: true
     },
     {

@@ -11,6 +11,7 @@ import AdminUserComponent from '../../components/AdminUserComponent/AdminUserCom
 import AdminPlantComponent from '../../components/AdminPlantComponent/AdminPlantComponent';
 import AdminCategoryComponent from '../../components/AdminCategoryComponent/AdminCategoryComponent';
 import AdminDiscountCom from '../../components/AdminDiscountCom/AdminDiscountCom';
+import AdminOrderCom from '../../components/AdminOrderCom/AdminOrderCom';
 
 const renderPage = (key) => {
     switch (key) {
@@ -18,6 +19,7 @@ const renderPage = (key) => {
         case 'plant': return (<AdminPlantComponent />)
         case 'category': return (<AdminCategoryComponent />)
         case 'discount': return (<AdminDiscountCom />)
+        case 'order': return (<AdminOrderCom />)
         default: return (<></>)
     }
 }
@@ -42,6 +44,11 @@ const items = [
     {
         key: 'discount',
         label: 'Quản lý giảm giá',
+        icon: <AppstoreOutlined />,
+    },
+    {
+        key: 'order',
+        label: 'Quản lý đơn hàng',
         icon: <AppstoreOutlined />,
     },
 ];

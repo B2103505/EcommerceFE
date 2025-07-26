@@ -37,7 +37,7 @@ export const updatePlant = async (id, plantData, access_token) => {
 export const getDetailPlant = async (id) => {
     const res = await axios.get(`${API_URL}/plant/detail/${id}`);
     return res.data;
-  };
+};
 
 export const deletePlant = async (id, access_token) => {
     const res = await axiosJWT.delete(
@@ -48,6 +48,11 @@ export const deletePlant = async (id, access_token) => {
             }
         }
     );
+    return res.data;
+};
+
+export const fetchPlantsByCategory = async (categoryId, page = 1, limit = 10) => {
+    const res = await axios.get(`${API_URL}/plant/by-cate/${categoryId}?page=${page}&limit=${limit}`);
     return res.data;
 };
 

@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import GhnAddressCom from '../../components/GhnAddressCom/GhnAddressCom';
 import { toast } from "react-toastify";
+import { calculateShippingFee, getExpectedDeliveryTime } from '../../Service/GHNService'
+import { clearCart } from '../../Service/CartService'
 
 const OrderPage = () => {
     const { Title } = Typography;
@@ -25,6 +27,8 @@ const OrderPage = () => {
         Address_Phone: user.User_PhoneNumber || "",
         Address_Detail_Address: "",
     });
+    const [shippingFee, setShippingFee] = useState(0);
+    const [expectedDelivery, setExpectedDelivery] = useState(null);
 
     useEffect(() => {
         if (user?.User_Fullname || user?.User_PhoneNumber) {
@@ -59,6 +63,76 @@ const OrderPage = () => {
         }
     };
 
+    useEffect(() => {
+        const fetchShippingFee = async () => {
+            const rawAddress =
+                selectedAddressType === 'HOME'
+                    ? address
+                    : shippingAddress;
+
+            const baseAddress =
+                rawAddress
+                    ? selectedAddressType === 'HOME'
+                        ? {
+                            ...rawAddress,
+                            District_Id: rawAddress.Address_District_Id,
+                            WardCode: rawAddress.Address_WardCode,
+                        }
+                        : rawAddress
+                    : null;
+
+            const fromDistrictId = 1572;
+            const getAvailableServiceId = async (fromDistrictId, toDistrictId) => {
+                try {
+                    const res = await axios.post(`/api/ghn/available-services`, {
+                        from_district: fromDistrictId,
+                        to_district: toDistrictId,
+                    });
+
+                    const services = res.data?.data;
+                    return services?.[0]?.service_id || null;
+                } catch (error) {
+                    console.error("Không lấy được service_id khả dụng:", error);
+                    return null;
+                }
+            };
+
+            if (baseAddress?.District_Id && baseAddress?.WardCode) {
+                const serviceId = await getAvailableServiceId(1572, baseAddress.District_Id);
+
+                if (!serviceId) {
+                    console.warn("Không có service khả dụng cho tuyến này.");
+                    return;
+                }
+
+                const feeData = await calculateShippingFee(
+                    baseAddress.District_Id,
+                    baseAddress.WardCode,
+                    serviceId);
+
+                if (feeData && feeData.total) {
+                    setShippingFee(feeData.total);
+
+                    const leadtime = await getExpectedDeliveryTime(
+                        fromDistrictId,
+                        baseAddress.District_Id,
+                        serviceId,
+                        baseAddress.WardCode
+                    );
+
+                    if (leadtime) {
+                        setExpectedDelivery(new Date(leadtime * 1000));
+                    } else {
+                        setExpectedDelivery(null);
+                    }
+
+                }
+            }
+        };
+
+        fetchShippingFee();
+    }, [shippingAddress, address, selectedAddressType]);
+
     const handleDiscountChange = ({ itemId, quantity, originalPrice, discount }) => {
         setDiscountMap(prev => ({
             ...prev,
@@ -83,6 +157,12 @@ const OrderPage = () => {
 
 
     const handleOrderSubmit = async () => {
+
+        const mergedAddress = {
+            ...(selectedAddressType === 'HOME' ? address : shippingAddress),
+            ...(addressInfo || {})
+        };
+
         if (!selectedPayment) {
             return toast.warning('Vui lòng chọn phương thức thanh toán!');
         }
@@ -103,20 +183,51 @@ const OrderPage = () => {
 
             const res = await axios.post(`/api/order`, {
                 User_Id: userId,
-                Address_Id: selectedAddressType === 'HOME' ? address?._id : shippingAddress?._id,
+                Address_Id: mergedAddress?._id || null,
                 Payment_Method_Id: selectedPayment,
                 Order_Details: orderDetails,
-                Order_Total: getFinalPrice(),
-                Address_Fullname,
-                Address_Phone,
-                Address_Detail_Address
+                Order_Total: getFinalPrice() + shippingFee,  // tổng tiền bao gồm phí ship
+                Order_Fee: shippingFee,
+                Order_Delivery_Date: expectedDelivery,
+
+                Address_Fullname: mergedAddress?.Address_Fullname,
+                Address_Phone: mergedAddress?.Address_Phone,
+                Address_Detail_Address: mergedAddress?.Address_Detail_Address,
+                Address_Province_Id: mergedAddress?.Province_Id,
+                Address_Province_Name: mergedAddress?.Province_Name,
+                Address_District_Id: mergedAddress?.District_Id,
+                Address_District_Name: mergedAddress?.District_Name,
+                Address_WardCode: mergedAddress?.WardCode,
+                Address_WardName: mergedAddress?.WardName
             });
 
             if (res.data.status === 'OK') {
+
                 toast.success('Đặt hàng thành công!');
-                navigate('/order');
+                await clearCart(userId);
+                const orderId = res.data.data.order._id;
+                const totalAmount = getFinalPrice() + shippingFee;
+
+                const selectedMethod = paymentMethods.find(m => m._id === selectedPayment);
+                if (selectedMethod?.Payment_Method_Name === 'Thanh toán online') {
+                    const paymentRes = await axios.post('/api/vnpay/create_payment_url', {
+                        amount: totalAmount,
+                        orderId: orderId,
+                    });
+
+                    console.log('paymentRes.data.paymentUrl', paymentRes.data)
+
+                    if (paymentRes.data) {
+                        window.location.href = paymentRes.data;
+                        return;
+                    } else {
+                        toast.error('Không thể tạo link thanh toán VNPay!');
+                    }
+                }
+                navigate('/')
+
             } else {
-                toast.error(res.data.toast || 'Đặt hàng thất bại!');
+                toast.error(res.data.message || 'Đặt hàng thất bại!');
             }
         } catch (err) {
             console.error(err);
@@ -156,7 +267,7 @@ const OrderPage = () => {
                                 <p>Chưa có địa chỉ. Vui lòng cập nhật trước khi đặt hàng.</p>
                             )
                         ) : (
-                            <GhnAddressCom onSubmit={(addr) => setShippingAddress(addr)} />
+                            <GhnAddressCom onSelect={(addr) => setShippingAddress(addr)} />
                         )}
                     </Card>
 
@@ -250,7 +361,11 @@ const OrderPage = () => {
                             );
                         })}
                         <p><strong>Tổng cộng sau giảm giá:</strong> {getFinalPrice().toLocaleString()} VNĐ</p>
-
+                        <p><strong>Phí giao hàng:</strong> {shippingFee.toLocaleString()} VNĐ</p>
+                        <p><strong>Tổng thanh toán:</strong> {(getFinalPrice() + shippingFee).toLocaleString()} VNĐ</p>
+                        {expectedDelivery && (
+                            <p><strong>Dự kiến giao:</strong> {expectedDelivery.toLocaleDateString('vi-VN')}</p>
+                        )}
                     </Card>
 
                     <Card title="Phương thức thanh toán">
