@@ -215,8 +215,6 @@ const OrderPage = () => {
                         orderId: orderId,
                     });
 
-                    console.log('paymentRes.data.paymentUrl', paymentRes.data)
-
                     if (paymentRes.data) {
                         window.location.href = paymentRes.data;
                         return;
@@ -238,6 +236,8 @@ const OrderPage = () => {
     useEffect(() => {
         if (userId) fetchInitData();
     }, [userId]);
+
+    const hasExceedingItems = cartItems.some(item => item.Cart_Item_Quantity > (item.Plant_Id?.Plant_Quantity || 0));
 
     return (
         <div style={{ padding: '24px 120px' }}>
@@ -261,7 +261,6 @@ const OrderPage = () => {
                                 <>
                                     <p><strong>{address.Address_Type}</strong></p>
                                     <p>{address.Address_Province_Name}, {address.Address_District_Name}, {address.Address_WardName}</p>
-                                    <p>{address.Address_Detail_Address}</p>
                                 </>
                             ) : (
                                 <p>Chưa có địa chỉ. Vui lòng cập nhật trước khi đặt hàng.</p>
@@ -303,14 +302,21 @@ const OrderPage = () => {
 
                     <Card title="Sản phẩm trong giỏ" style={{ marginBottom: 20 }}>
                         {cartItems.map(item => {
-                            const discount = discountMap[item._id]?.discount?.Discount_Value || 0;
+                            const discount = selectedDiscounts[item._id]?.Discount_Value || 0;
+
                             const price = item.Cart_Item_Price;
                             const finalPrice = price - Math.round(price * discount / 100);
+                            const availableQuantity = item.Plant_Id?.Plant_Quantity || 0;
+                            const isExceed = item.Cart_Item_Quantity > availableQuantity;
 
                             return (
                                 <Card
                                     key={item._id}
-                                    style={{ marginBottom: 12 }}
+                                    style={{
+                                        marginBottom: 12,
+                                        border: isExceed ? '1px solid red' : undefined,
+                                        backgroundColor: isExceed ? '#fff1f0' : undefined
+                                    }}
                                 >
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                                         <img
@@ -321,14 +327,21 @@ const OrderPage = () => {
 
                                         <div style={{ flex: 1 }}>
                                             <h4>{item.Plant_Id?.Plant_Name}</h4>
-                                            <p>Giá gốc: {item.Cart_Item_Price.toLocaleString()} VNĐ</p>
-                                            <p>Số lượng: {item.Cart_Item_Quantity}</p>
+                                            <p>Giá gốc: {price.toLocaleString()} VNĐ</p>
+                                            <p>Số lượng đặt: {item.Cart_Item_Quantity}</p>
+                                            <p>Còn lại trong kho: {availableQuantity}</p>
+
+                                            {isExceed && (
+                                                <p style={{ color: 'red', fontWeight: 'bold' }}>
+                                                    ⚠️ Số lượng đặt vượt quá tồn kho!
+                                                </p>
+                                            )}
 
                                             {selectedDiscounts[item._id] ? (
                                                 <>
                                                     <p>Giảm giá: {selectedDiscounts[item._id].Discount_Value}%</p>
                                                     <p style={{ color: 'green', fontWeight: 'bold' }}>
-                                                        Giá sau giảm: {(item.Cart_Item_Price - Math.round(item.Cart_Item_Price * selectedDiscounts[item._id].Discount_Value / 100)).toLocaleString()} VNĐ
+                                                        Giá sau giảm: {finalPrice.toLocaleString()} VNĐ
                                                     </p>
                                                 </>
                                             ) : (
@@ -383,9 +396,18 @@ const OrderPage = () => {
                     </Card>
 
                     <div style={{ marginTop: 20 }}>
-                        <Button type="primary" onClick={handleOrderSubmit}>
+                        <Button
+                            type="primary"
+                            onClick={handleOrderSubmit}
+                            disabled={hasExceedingItems}
+                        >
                             Xác nhận đặt hàng
                         </Button>
+                        {hasExceedingItems && (
+                            <p style={{ color: 'red', marginTop: 8 }}>
+                                ⚠️ Một số sản phẩm vượt quá số lượng tồn kho. Vui lòng điều chỉnh trước khi đặt hàng.
+                            </p>
+                        )}
                     </div>
                 </>
             )}

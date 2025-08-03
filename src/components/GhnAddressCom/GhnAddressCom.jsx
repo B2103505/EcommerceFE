@@ -47,8 +47,6 @@ const GhnAddressCom = ({ onSelect, initialValue = {} }) => {
                         if (WardCode && WardName) {
                             const ward = { WardCode, WardName };
                             setSelectedWard(ward);
-
-                            // Trả dữ liệu về
                             if (onSelect) {
                                 onSelect({
                                     Province_Id,

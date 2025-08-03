@@ -37,7 +37,6 @@ const UserProfilePage = () => {
         const fetchAddress = async () => {
             try {
                 const res = await UserService.getAddressByUserId(user?.User_Id);
-                console.log('address', res)
                 if (res.status === 'OK') {
                     setAddressData(res.data);
                 }

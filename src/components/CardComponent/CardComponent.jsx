@@ -5,7 +5,6 @@ import { StarFilled } from '@ant-design/icons';
 
 const CardComponent = ({ data }) => {
     const navigate = useNavigate();
-
     const handleClick = () => {
         if (data?._id) {
             navigate(`/detail-product/${data._id}`);
@@ -34,12 +33,8 @@ const CardComponent = ({ data }) => {
                 <span>|</span>
                 <span style={{ marginLeft: '15px' }}>Đã bán {data?.Plant_Sold || 0}</span>
             </WrapperRateProduct>
-
             <WrapperPriceProduct>
                 {data?.Plant_Price?.toLocaleString('vi-VN')}đ
-                <WrapperDiscountProduct>
-                    {data?.Discount || "-10%"}
-                </WrapperDiscountProduct>
             </WrapperPriceProduct>
         </WrapperCardStyle>
     );

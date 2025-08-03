@@ -74,7 +74,7 @@ const AdminCategoryComponent = () => {
     const handleSubmit = async () => {
         try {
             const values = await form.validateFields();
-            console.log("Form values:", values);
+            
             const finalData = {
                 ...values,
             };

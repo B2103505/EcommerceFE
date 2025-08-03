@@ -1,20 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Col, Pagination, Row } from "antd";
-import NavBarComponent from "../../components/NavBarComponent/NavBarComponent";
+import { useQuery } from "@tanstack/react-query";
+import { fetchPlantsByCategory } from '../../Service/PlantService';
+import { getAllCategory } from '../../Service/CategoryService';
 import CardComponent from "../../components/CardComponent/CardComponent";
 import { WrapperNavBar, WrapperProduct } from "./style";
-import { fetchPlantsByCategory } from '../../Service/PlantService'
+import { CategoryItemStyled, WrapperTypeProduct } from "../HomePage/Style";
 
 const CategoryPage = () => {
     const { id: categoryId } = useParams();
+    const navigate = useNavigate();
     const [products, setProducts] = useState([]);
     const [total, setTotal] = useState(0);
     const [page, setPage] = useState(1);
 
     const fetchData = async () => {
         try {
-            const res = await fetchPlantsByCategory(categoryId, page, 10);
+            const res = await fetchPlantsByCategory(categoryId, page, 8);
             setProducts(res.data.plants);
             setTotal(res.data.total);
         } catch (err) {
@@ -30,10 +33,38 @@ const CategoryPage = () => {
         setPage(pageNumber);
     };
 
+    const fetchAllCategories = async () => {
+        const res = await getAllCategory();
+        if (res?.status === 'OK') {
+            return res.data;
+        }
+        return [];
+    };
+
+    const { data: categories } = useQuery({
+        queryKey: ['Categories'],
+        queryFn: fetchAllCategories
+    });
+
     return (
         <div style={{ padding: '0 120px', background: '#efefef' }}>
-            <Row style={{ flexWrap: 'nowrap', paddingTop: '20px' }}>
+            {/* --- Danh sách category ở trên cùng --- */}
+            <WrapperTypeProduct>
+                {categories?.map((item) => (
+                    <CategoryItemStyled
+                        key={item._id}
+                        onClick={() => navigate(`/cate/${item._id}`)}
+                        style={{
+                            backgroundColor: item._id === categoryId ? '#1890ff' : undefined,
+                            color: item._id === categoryId ? '#fff' : undefined,
+                        }}
+                    >
+                        {item.Category_Name}
+                    </CategoryItemStyled>
+                ))}
+            </WrapperTypeProduct>
 
+            <Row style={{ flexWrap: 'nowrap', paddingTop: '20px' }}>
                 <Col span={20}>
                     <WrapperProduct>
                         <Row gutter={[16, 16]}>
@@ -48,7 +79,7 @@ const CategoryPage = () => {
                                 showQuickJumper
                                 current={page}
                                 total={total}
-                                pageSize={10}
+                                pageSize={8}
                                 onChange={handleChangePage}
                             />
                         </div>

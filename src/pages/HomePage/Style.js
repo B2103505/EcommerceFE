@@ -1,20 +1,10 @@
 import styled from "styled-components";
 import ButtonComponent from "../../components/ButtonComponent/ButtonComponent";
 
-// export const WrapperTypeProduct = styled.div`
-//   display: flex;
-//   align-items: center;
-//   gap: 16px;
-//   justify-content: flex-start;
-//   font-size: 16px;
-//   height: 40px;
-//   flex-wrap: wrap;
-// `;
-
 export const WrapperTypeProduct = styled.div`
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;  // căn giữa
+    justify-content: center;
     gap: 12px;
     padding: 12px 0;
 `;
@@ -34,17 +24,6 @@ export const CategoryItemStyled = styled.div`
     border-color: #1890ff;
   }
 `;
-
-
-// export const WrapperBtnMore = styled(ButtonComponent)`
-//     &:hover{
-//         color: #fff;
-//         background: rgb(13,92,182);
-//         span {
-//             color: #fff;
-//         }
-//     }
-// `
 
 export const WrapperBtnMore = styled(ButtonComponent)`
     border-radius: 8px;

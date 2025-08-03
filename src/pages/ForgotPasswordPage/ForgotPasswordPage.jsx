@@ -37,7 +37,7 @@ const Title = styled.h2`
 const ForgotPasswordPage = () => {
     const onFinish = (values) => {
         console.log('Forgot password request:', values);
-        // call API forgot password ở đây nếu cần
+        // call API forgot password
         message.success('Đã gửi yêu cầu đặt lại mật khẩu. Vui lòng kiểm tra email!');
     };
 

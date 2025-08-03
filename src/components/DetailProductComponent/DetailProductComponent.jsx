@@ -143,12 +143,6 @@ const DetailProductComponent = ({ data }) => {
                     </WrapperPriceTextProduct>
                 </WrapperPriceProduct>
 
-                <WrapperAddress>
-                    <span>Giao đến </span>
-                    <span className="address">Ninh Kiều, Cần Thơ</span>
-                    <span className="change-address"> - Đổi địa chỉ</span>
-                </WrapperAddress>
-
                 <div style={{ margin: '16px 0', padding: '16px 0', borderTop: '1px solid #eee', borderBottom: '1px solid #eee' }}>
                     <div style={{ marginBottom: '10px' }}>Số lượng</div>
                     <WrapperQuantityProduct>

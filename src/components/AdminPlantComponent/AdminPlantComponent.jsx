@@ -65,7 +65,7 @@ const AdminPlantPage = () => {
     const foliageDensities = [
         "Rất thưa", "Thưa", "Trung bình", "Dày", "Rất dày", "Siêu rậm rạp"
     ];
-    
+
     const fetchPlants = async (params = { page: 1, limit: 8 }) => {
         setLoading(true);
         const res = await getAllPlant(params);
@@ -89,9 +89,6 @@ const AdminPlantPage = () => {
                     getAllCategory(),
                     getValidDiscounts()
                 ]);
-
-                console.log("categoryRes", categoryRes);
-                console.log("discountRes", discountRes);
 
                 if (categoryRes?.status === "OK") {
                     setCategories(categoryRes.data);
@@ -130,7 +127,7 @@ const AdminPlantPage = () => {
             setDescription(record.Plant_Description || "");
             form.setFieldsValue({
                 ...record,
-                Category_Id: Array.isArray(record.Category_Id) ? record.Category_Id : [record.Category_Id],
+                Category_Ids: Array.isArray(record.Category_Ids) ? record.Category_Ids : [record.Category_Ids],
                 Discount_Ids: Array.isArray(record.Discount_Ids) ? record.Discount_Ids : []
             });
             setPreviewImages(record.Plant_Images || []);

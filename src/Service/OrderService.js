@@ -9,7 +9,7 @@ export const getOrdersByUser = async (userId) => {
 };
 
 export const getOrderById = async (orderId) => {
-    return await axios.get(`${process.env.REACT_APP_API_KEY}/orders/${orderId}`);
+    return await axios.get(`${process.env.REACT_APP_API_KEY}/order/${orderId}`);
 };
 
 export const updateOrderStatus = async (orderId, statusId) => {

@@ -13,6 +13,8 @@ import CartPage from "../pages/CartPage/CartPage";
 import OrderSuccessPage from "../pages/OrderPage/OrderSuccessPage";
 import OrderFailedPage from "../pages/OrderPage/OrderFailedPage";
 import SearchPage from "../pages/SearchPage/SearchPage";
+import PredictPage from "../pages/PredictPage/PredictPage";
+import MyOrder from '../pages/MyOrder/MyOrder'
 
 export const routes = [
     {
@@ -84,6 +86,16 @@ export const routes = [
     {
         path: '/search',
         page: SearchPage,
+        isShowHeader: true
+    },
+    {
+        path: '/predict',
+        page: PredictPage,
+        isShowHeader: true
+    },
+    {
+        path: '/my-order',
+        page: MyOrder,
         isShowHeader: true
     },
     {

@@ -30,7 +30,7 @@ const AdminUserComponent = () => {
     const fetchUsers = async (page = 1, pageSize = 5) => {
         setLoading(true);
         try {
-            const res = await UserService.getAllUser(page, pageSize, user?.access_token); // ✅ Thêm token
+            const res = await UserService.getAllUser(page, pageSize, user?.access_token);
             if (res?.status === "OK") {
                 setUsers(res.data);
                 setPagination({
@@ -69,7 +69,7 @@ const AdminUserComponent = () => {
 
     const handleDelete = async (id) => {
         try {
-            const res = await UserService.deleteUser(id, access_token); // ✅ Truyền token
+            const res = await UserService.deleteUser(id, access_token);
             if (res?.status === "OK") {
                 toast.success("Xóa thành công");
                 fetchUsers(pagination.current, pagination.pageSize);

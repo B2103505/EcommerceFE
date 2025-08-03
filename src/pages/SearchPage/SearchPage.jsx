@@ -4,6 +4,7 @@ import { getAllPlant } from "../../Service/PlantService";
 import { getAllCategory } from "../../Service/CategoryService";
 import CardComponent from "../../components/CardComponent/CardComponent";
 import { useLocation } from 'react-router-dom';
+import SearchAdvancedForm from "../SearchAdvanceForm";
 
 const { Option } = Select;
 const { Title } = Typography;
@@ -19,6 +20,8 @@ const SearchPage = () => {
     const location = useLocation();
     const keyword = location.state?.keyword || '';
     const [products, setProducts] = useState([]);
+    const [searchMode, setSearchMode] = useState("basic");
+    const [advancedResults, setAdvancedResults] = useState([]);
 
     const leafShapes = ["Lá kim", "Lá tròn", "Lá dài", "Lá xoăn", "Lá trái tim", "Lá dẻ quạt", "Lá mác", "Lá bầu dục", "Lá hình thoi", "Lá chẻ", "Lá hình chân vịt"];
     const leafColors = ["Xanh đậm", "Xanh nhạt", "Xanh sọc", "Xanh vàng", "Xanh lục", "Xanh ánh bạc", "Xanh tím", "Xanh pha đỏ", "Xanh ánh đồng", "Xanh rêu"];
@@ -45,17 +48,23 @@ const SearchPage = () => {
     useEffect(() => {
         fetchCategories();
 
-        // Nếu có keyword từ state, thì tự động set và tìm kiếm
         if (keyword) {
             setfilterKey("Plant_Name");
             setfilterValue(keyword);
             setPageCurr(1);
-            handleSearch();
-            fetchPlants();
         } else {
             fetchPlants();
         }
     }, []);
+
+    useEffect(() => {
+        // Khi filterKey và filterValue thay đổi thì gọi fetchPlants
+        const timer = setTimeout(() => {
+            fetchPlants();
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [filterKey, filterValue]);
 
     useEffect(() => {
         fetchPlants();
@@ -68,81 +77,103 @@ const SearchPage = () => {
 
     return (
         <Card title="Tìm kiếm cây cảnh" style={{ background: "#f9f9f9" }}>
-            <Row gutter={16} style={{ marginBottom: 16 }}>
-                <Col span={6}>
-                    <Select value={filterKey} onChange={(value) => setfilterKey(value)} style={{ width: "100%" }}>
-                        <Option value="Plant_Name">Tên cây</Option>
-                        <Option value="Plant_Status">Trạng thái</Option>
-                        <Option value="Category_Ids">Danh mục</Option>
-                        <Option value="Plant_Scientific_Name">Tên khoa học</Option>
-                        <Option value="Plant_Leaf_Shape">Dạng lá</Option>
-                        <Option value="Plant_Leaf_Color">Màu sắc lá</Option>
-                        <Option value="Plant_Growth_Form">Dáng phát triển</Option>
-                        <Option value="Plant_Context">Không gian trưng bày</Option>
-                        <Option value="Plant_Light">Ánh sáng</Option>
+            <Row style={{ marginBottom: 16 }}>
+                <Col span={24}>
+                    <Select
+                        value={searchMode}
+                        onChange={value => setSearchMode(value)}
+                        style={{ width: 200 }}
+                    >
+                        <Option value="basic">🔍 Tìm kiếm cơ bản</Option>
+                        <Option value="advanced">🧠 Tìm kiếm nâng cao</Option>
                     </Select>
-                </Col>
-
-                <Col span={12}>
-                    {filterKey === "Category_Ids" ? (
-                        <Select
-                            showSearch
-                            style={{ width: "100%" }}
-                            placeholder="Chọn danh mục"
-                            value={filterValue}
-                            onChange={(value) => setfilterValue(value)}
-                            optionFilterProp="children"
-                        >
-                            {categories.map((cate) => (
-                                <Option key={cate._id} value={cate.Category_Name}>
-                                    {cate.Category_Name}
-                                </Option>
-                            ))}
-                        </Select>
-                    ) : filterKey === "Plant_Leaf_Shape" ? (
-                        <Select value={filterValue} style={{ width: "100%" }} onChange={setfilterValue}>
-                            {leafShapes.map(shape => <Option key={shape}>{shape}</Option>)}
-                        </Select>
-                    ) : filterKey === "Plant_Leaf_Color" ? (
-                        <Select value={filterValue} style={{ width: "100%" }} onChange={setfilterValue}>
-                            {leafColors.map(color => <Option key={color}>{color}</Option>)}
-                        </Select>
-                    ) : filterKey === "Plant_Growth_Form" ? (
-                        <Select value={filterValue} style={{ width: "100%" }} onChange={setfilterValue}>
-                            {growthForms.map(form => <Option key={form}>{form}</Option>)}
-                        </Select>
-                    ) : (
-                        <Input
-                            value={filterValue}
-                            onChange={(e) => setfilterValue(e.target.value)}
-                            placeholder="Nhập từ khóa"
-                        />
-                    )}
-                </Col>
-
-                <Col span={4}>
-                    <Button type="primary" onClick={handleSearch} block>
-                        Tìm kiếm
-                    </Button>
                 </Col>
             </Row>
 
-            {/* Render kết quả dạng Card */}
+            {searchMode === "basic" && (
+                <Row gutter={16} style={{ marginBottom: 16 }}>
+                    <Col span={6}>
+                        <Select value={filterKey} onChange={(value) => setfilterKey(value)} style={{ width: "100%" }}>
+                            <Option value="Plant_Name">Tên cây</Option>
+                            <Option value="Plant_Status">Trạng thái</Option>
+                            <Option value="Category_Ids">Danh mục</Option>
+                            <Option value="Plant_Scientific_Name">Tên khoa học</Option>
+                            <Option value="Plant_Leaf_Shape">Dạng lá</Option>
+                            <Option value="Plant_Leaf_Color">Màu sắc lá</Option>
+                            <Option value="Plant_Growth_Form">Dáng phát triển</Option>
+                            <Option value="Plant_Context">Không gian trưng bày</Option>
+                            <Option value="Plant_Light">Ánh sáng</Option>
+                        </Select>
+                    </Col>
+
+                    <Col span={12}>
+                        {filterKey === "Category_Ids" ? (
+                            <Select
+                                showSearch
+                                style={{ width: "100%" }}
+                                placeholder="Chọn danh mục"
+                                value={filterValue}
+                                onChange={(value) => setfilterValue(value)}
+                                optionFilterProp="children"
+                            >
+                                {categories.map((cate) => (
+                                    <Option key={cate._id} value={cate.Category_Name}>
+                                        {cate.Category_Name}
+                                    </Option>
+                                ))}
+                            </Select>
+                        ) : filterKey === "Plant_Leaf_Shape" ? (
+                            <Select value={filterValue} style={{ width: "100%" }} onChange={setfilterValue}>
+                                {leafShapes.map(shape => <Option key={shape}>{shape}</Option>)}
+                            </Select>
+                        ) : filterKey === "Plant_Leaf_Color" ? (
+                            <Select value={filterValue} style={{ width: "100%" }} onChange={setfilterValue}>
+                                {leafColors.map(color => <Option key={color}>{color}</Option>)}
+                            </Select>
+                        ) : filterKey === "Plant_Growth_Form" ? (
+                            <Select value={filterValue} style={{ width: "100%" }} onChange={setfilterValue}>
+                                {growthForms.map(form => <Option key={form}>{form}</Option>)}
+                            </Select>
+                        ) : (
+                            <Input
+                                value={filterValue}
+                                onChange={(e) => setfilterValue(e.target.value)}
+                                placeholder="Nhập từ khóa"
+                            />
+                        )}
+                    </Col>
+
+                    <Col span={4}>
+                        <Button type="primary" onClick={handleSearch} block>
+                            Tìm kiếm
+                        </Button>
+                    </Col>
+                </Row>
+            )}
+
+            {searchMode === "advanced" && (
+                <SearchAdvancedForm onSearchResult={setAdvancedResults} />
+            )}
+
+
             <Row gutter={[16, 16]}>
-                {plantList.map((plant) => (
+                {(searchMode === "basic" ? plantList : advancedResults).map((plant) => (
                     <Col key={plant._id} xs={24} sm={12} md={8} lg={6} xl={4}>
                         <CardComponent data={plant} />
                     </Col>
                 ))}
             </Row>
 
-            <Pagination
-                style={{ marginTop: 24, textAlign: "center" }}
-                current={pageCurr}
-                total={totalPage * limit}
-                pageSize={limit}
-                onChange={(page) => setPageCurr(page)}
-            />
+            {searchMode === "basic" && (
+                <Pagination
+                    style={{ marginTop: 24, textAlign: "center" }}
+                    current={pageCurr}
+                    total={totalPage * limit}
+                    pageSize={limit}
+                    onChange={(page) => setPageCurr(page)}
+                />
+            )}
+
         </Card>
     );
 };

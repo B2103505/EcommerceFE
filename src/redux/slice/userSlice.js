@@ -19,7 +19,6 @@ export const userSlice = createSlice({
     updateUser: (state, action) => {
       const { User_Email = '', User_Fullname = '', User_PhoneNumber = '',
         access_token = '', User_Address = '', User_Avatar = '', _id = '', User_Id = '', Role_Id = '' } = action.payload
-      // console.log('action', action)
       state.User_Fullname = User_Fullname
       state.User_Email = User_Email
       state.access_token = access_token
@@ -27,12 +26,11 @@ export const userSlice = createSlice({
       state.User_Address = User_Address
       state.User_Avatar = User_Avatar
       state.User_Id = _id || User_Id;
-      // if (Role_Id === '686d164d833c9c6a3a7729e6' || Role_Id === '686d164d833c9c6a3a7729e9') {
-      //   state.isPermis = true;
-      // } else {
-      //   state.isPermis = false;
-      // }
-      state.isPermis = true
+      if (Role_Id === '686d164d833c9c6a3a7729e6' || Role_Id === '686d164d833c9c6a3a7729e9') {
+        state.isPermis = true;
+      } else {
+        state.isPermis = false;
+      }
     },
     resetUser: (state, action) => {
       state.User_Fullname = ''
@@ -47,7 +45,6 @@ export const userSlice = createSlice({
   },
 })
 
-// Action creators are generated for each case reducer function
 export const { updateUser, resetUser } = userSlice.actions
 
 export default userSlice.reducer

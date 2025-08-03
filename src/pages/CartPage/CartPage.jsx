@@ -53,7 +53,7 @@ const CartPage = () => {
     useEffect(() => {
         if (userId) fetchCart();
     }, [userId]);
-    // console.log('cartItems:', cartItems);
+
     return (
         <div style={{ padding: '20px 120px' }}>
 

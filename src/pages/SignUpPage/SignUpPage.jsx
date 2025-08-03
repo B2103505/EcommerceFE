@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom';
 import * as UserService from '../../Service/UserService'
 import { useMutationHooks } from '../../hooks/useMutationHook';
 import { toast } from 'react-toastify';
-// import * as messageComponent from '../../components/MessageComponent/MessageComponent'
 import { useNavigate } from 'react-router-dom';
 
 const PageWrapper = styled.div`
@@ -46,11 +45,8 @@ const SignUpPage = () => {
     const mutation = useMutationHooks(data => UserService.SignUpUser(data))
 
     const onFinish = (values) => {
-        // console.log('Register info:', values);
-        // call API register ở đây
         mutation.mutate(values, {
             onSuccess: (res) => {
-                // console.log('res', res.status)
                 if (res.status === 'ERR') {
                     toast.error(res.message);
                 } else {

@@ -139,7 +139,7 @@ const AdminOrderCom = () => {
             dataIndex: 'Payment_Status_Id',
             render: (value, record) => (
                 <Select
-                    value={value?._id || undefined} // 👈 fallback nếu null
+                    value={value?._id || undefined}
                     onChange={(val) => handleUpdateStatus(record._id, 'Payment_Status_Id', val)}
                     style={{ width: 160 }}
                     placeholder="Chọn trạng thái"

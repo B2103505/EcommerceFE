@@ -16,7 +16,7 @@ const OrderSuccessPage = () => {
                 <Button type="primary" key="home" onClick={() => navigate('/')}>
                     Về trang chủ
                 </Button>,
-                <Button key="orders" onClick={() => navigate('/my-orders')}>
+                <Button key="orders" onClick={() => navigate('/my-order')}>
                     Xem đơn hàng
                 </Button>,
             ]}

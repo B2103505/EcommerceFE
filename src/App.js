@@ -9,7 +9,6 @@ import HeaderComponent from './components/HeaderComponent/HeaderComponent';
 import DefaultComponent from './components/DefaultComponent/DefaultComponent';
 import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
-// ✅ Thêm import cho Toastify
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { isJsonString } from './utils';
@@ -31,17 +30,6 @@ function App() {
     }
   }, [])
 
-  // const handleDecoded = () => {
-  //   let storeData = localStorage.getItem('access_token')
-  //   let decoded = {}
-
-  //   if (storeData && isJsonString(storeData)) {
-  //     storeData = JSON.parse(storeData)
-  //     decoded = jwtDecode(storeData)
-  //   }
-  //   return { decoded, storeData }
-  // }
-
   const handleDecoded = () => {
     const token = localStorage.getItem('access_token');
     if (token && isJsonString(token)) {
@@ -58,24 +46,10 @@ function App() {
   };
 
 
-  // UserService.axiosJWT.interceptors.request.use(async (config) => {
-  //   const currTime = new Date()
-  //   const { decoded } = handleDecoded()
-  //   if (decoded?.exp < currTime.getTime() / 1000) {
-  //     const data = await UserService.refreshToken()
-  //     config.headers['authorization'] = `Bearer ${data?.access_token}`
-  //   }
-  //   return config;
-  // }, function (error) {
-  //   return Promise.reject(error)
-  // })
-
   const handleLogout = async () => {
-    // setLoading(true)
     await UserService.LogoutUser()
     localStorage.removeItem('access_token');
     dispatch(resetUser())
-    // setLoading(false)
   }
 
   UserService.axiosJWT.interceptors.request.use(
@@ -109,14 +83,6 @@ function App() {
     const respn = await UserService.getDetailUser(id, token)
     dispatch(updateUser({ ...respn?.data, access_token: token }))
   }
-
-  // const fetchApi = async () => {
-  //   const res = await axios.get(`${process.env.REACT_APP_API_KEY}/plant/getAllPlant`)
-  //   return res.data
-  // }
-
-  // const query = useQuery({ queryKey: ['todos'], queryFn: fetchApi })
-  // if (query.data) console.log('query', query.data)
 
   return (
     <div>

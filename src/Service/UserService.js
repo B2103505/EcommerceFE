@@ -86,7 +86,7 @@ export const createUser = async (data, access_token) => {
     const res = await axios.post(`${process.env.REACT_APP_API_KEY}/user/sign-up`, data, {
         headers: {
             'Content-Type': 'application/json',
-            authorization: `Bearer ${access_token}`, // Nếu backend yêu cầu
+            authorization: `Bearer ${access_token}`,
         }
     });
     return res.data;

@@ -16,6 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import * as UserService from '../../Service/UserService'
 import { resetUser } from '../../redux/slice/userSlice'
 import { getCartByUserId } from '../../Service/CartService'
+import { CameraOutlined } from '@ant-design/icons';
 
 const HeaderComponent = () => {
     const navigate = useNavigate();
@@ -58,18 +59,18 @@ const HeaderComponent = () => {
     }
 
     const handleGetDetail = async () => {
-        console.log('detail user', user)
         navigate('/profile-user')
     }
 
     const content = () => {
         return (
             <div>
+                <WrapperTextPopupUser onClick={handleGetDetail}>Thông tin người dùng</WrapperTextPopupUser>
+                <WrapperTextPopupUser onClick={() => navigate('/my-order')}>Quản lý đơn hàng</WrapperTextPopupUser>
+                <WrapperTextPopupUser onClick={handleLogout}>Đăng xuất</WrapperTextPopupUser>
                 {user?.isPermis && (
                     <WrapperTextPopupUser onClick={() => navigate('/system/admin')}>Quản lý hệ thống</WrapperTextPopupUser>
                 )}
-                <WrapperTextPopupUser onClick={handleGetDetail}>Thông tin người dùng</WrapperTextPopupUser>
-                <WrapperTextPopupUser onClick={handleLogout}>Đăng xuất</WrapperTextPopupUser>
             </div>
         )
     }
@@ -83,7 +84,7 @@ const HeaderComponent = () => {
 
     const handleSearch = (keyword) => {
         if (keyword && keyword.trim() !== '') {
-            navigate('/search', { state: { keyword: 'aaa' } });
+            navigate('/search', { state: { keyword } });
         }
     };
 
@@ -91,7 +92,7 @@ const HeaderComponent = () => {
     return (
         <div>
             <WrapperHeader gutter={16}>
-                <Col span={6} onClick={() => navigate('/')}
+                <Col span={4} onClick={() => navigate('/')}
                     style={{ cursor: 'pointer' }}>
                     <WrapperText>Plant indoor</WrapperText>
                 </Col>
@@ -107,15 +108,19 @@ const HeaderComponent = () => {
                     />
                 </Col>
 
-                <Col span={6} style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+                <Col span={8} style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
                     <div style={{ cursor: 'pointer' }}>
                         <WrapperHeaderAccount>
                             <UserOutlined style={{ fontSize: '30px' }} />
                             {user?.User_Fullname ? (
                                 <>
                                     <Popover content={content} trigger='click'>
-                                        <div>{user.User_Fullname}</div>
+                                        <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+                                            <span>{user.User_Fullname}</span>
+                                            <CaretDownOutlined />
+                                        </div>
                                     </Popover>
+
                                 </>
                             ) : (
                                 <div onClick={handleRedirect}>
@@ -128,6 +133,15 @@ const HeaderComponent = () => {
                             )}
                         </WrapperHeaderAccount>
                     </div>
+
+                    <div
+                        style={{ display: 'flex', gap: '5px', alignItems: 'center', cursor: 'pointer' }}
+                        onClick={() => navigate('/predict')}
+                    >
+                        <CameraOutlined style={{ fontSize: '26px', color: '#fff' }} />
+                        <WrapperTextSmall>Nhận dạng</WrapperTextSmall>
+                    </div>
+
 
                     <div
                         style={{ display: 'flex', gap: '5px', alignItems: 'center', cursor: 'pointer' }}

@@ -4,6 +4,10 @@ import {
     MenuUnfoldOutlined,
     PieChartOutlined,
     UserOutlined,
+    ShopOutlined,
+    TagsOutlined,
+    ShoppingCartOutlined,
+    PercentageOutlined,
 } from '@ant-design/icons';
 import { Button, Menu } from 'antd';
 import React, { useState } from "react";
@@ -34,22 +38,22 @@ const items = [
     {
         key: 'plant',
         label: 'Quản lý sản phẩm',
-        icon: <AppstoreOutlined />,
+        icon: <ShopOutlined />,
     },
     {
         key: 'category',
         label: 'Quản lý danh mục',
-        icon: <AppstoreOutlined />,
+        icon: <TagsOutlined />,
     },
     {
         key: 'discount',
         label: 'Quản lý giảm giá',
-        icon: <AppstoreOutlined />,
+        icon: <PercentageOutlined />,
     },
     {
         key: 'order',
         label: 'Quản lý đơn hàng',
-        icon: <AppstoreOutlined />,
+        icon: <ShoppingCartOutlined />,
     },
 ];
 

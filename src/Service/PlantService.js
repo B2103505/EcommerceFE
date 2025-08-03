@@ -56,5 +56,10 @@ export const fetchPlantsByCategory = async (categoryId, page = 1, limit = 10) =>
     return res.data;
 };
 
+export const searchAdvancedPlants = async (params) => {
+    const res = await axios.post(`${API_URL}/plant/search-advanced`, params);
+    return res.data;
+};
+
 
 
