@@ -1,48 +1,75 @@
 import React from 'react';
 import { Form, Input, Button, message } from 'antd';
-import styled from 'styled-components';
-import { Link } from 'react-router-dom';
-import * as UserService from '../../Service/UserService'
+import styled, { keyframes } from 'styled-components';
+import { Link, useNavigate } from 'react-router-dom';
+import * as UserService from '../../Service/UserService';
 import { useMutationHooks } from '../../hooks/useMutationHook';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
+
+const fadeInUp = keyframes`
+  0% { opacity: 0; transform: translateY(20px);}
+  100% { opacity: 1; transform: translateY(0);}
+`;
 
 const PageWrapper = styled.div`
   min-height: 100vh;
-  background: linear-gradient(135deg,rgb(117, 238, 117),rgb(154, 165, 154));
+  background: linear-gradient(135deg, #e0f7da 0%, #fff8dc 100%);
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 20px;
 `;
 
 const SignUpWrapper = styled.div`
   width: 500px;
-  padding: 32px;
-  backdrop-filter: blur(8px);
-  background: rgb(156, 221, 186);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-  color: #fff;
-  transition: all 0.3s ease;
+  max-width: 100%;
+  padding: 40px 32px;
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 20px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+  animation: ${fadeInUp} 0.6s ease forwards;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 
   &:hover {
     transform: translateY(-5px);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
   }
 `;
 
 const Title = styled.h2`
   text-align: center;
   margin-bottom: 24px;
-  color: #fff;
   font-family: 'Segoe UI', sans-serif;
+  color: #2d552d;
+`;
+
+const StyledButton = styled(Button)`
+  background: linear-gradient(135deg, #5cb85c 0%, #2e8b57 100%);
+  border: none;
+  font-weight: bold;
+  height: 45px;
+  transition: all 0.3s ease;
+
+  &:hover, &:focus {
+    background: linear-gradient(135deg, #2e8b57 0%, #5cb85c 100%);
+    transform: translateY(-2px);
+  }
+`;
+
+const StyledLink = styled(Link)`
+  color: #2e8b57;
+  text-decoration: underline;
+
+  &:hover {
+    color: #145214;
+  }
 `;
 
 const SignUpPage = () => {
-
     const navigate = useNavigate();
 
-    const mutation = useMutationHooks(data => UserService.SignUpUser(data))
+    const mutation = useMutationHooks(data => UserService.SignUpUser(data));
 
     const onFinish = (values) => {
         mutation.mutate(values, {
@@ -63,54 +90,50 @@ const SignUpPage = () => {
         <PageWrapper>
             <SignUpWrapper>
                 <Title>Đăng ký tài khoản</Title>
-                <Form
-                    name="signup-form"
-                    onFinish={onFinish}
-                    layout="vertical"
-                >
+                <Form name="signup-form" onFinish={onFinish} layout="vertical">
                     <Form.Item
-                        label={<span style={{ color: '#fff' }}>Họ tên</span>}
+                        label="Họ tên"
                         name="User_Fullname"
                         rules={[{ required: true, message: 'Vui lòng nhập họ tên!' }]}
                     >
-                        <Input placeholder="Nhập họ tên của bạn" />
+                        <Input placeholder="Nhập họ tên" style={{ borderRadius: 8, height: 40 }} />
                     </Form.Item>
 
                     <Form.Item
-                        label={<span style={{ color: '#fff' }}>Email</span>}
+                        label="Email"
                         name="User_Email"
                         rules={[
                             { required: true, message: 'Vui lòng nhập Email!' },
                             { type: 'email', message: 'Email không hợp lệ!' },
                         ]}
                     >
-                        <Input placeholder="Nhập email của bạn" />
+                        <Input placeholder="Nhập email" style={{ borderRadius: 8, height: 40 }} />
                     </Form.Item>
 
                     <Form.Item
-                        label={<span style={{ color: '#fff' }}>Số điện thoại</span>}
+                        label="Số điện thoại"
                         name="User_PhoneNumber"
                         rules={[
                             { required: true, message: 'Vui lòng nhập số điện thoại!' },
                             { pattern: /^\d{9,11}$/, message: 'Số điện thoại không hợp lệ!' },
                         ]}
                     >
-                        <Input placeholder="Nhập số điện thoại" />
+                        <Input placeholder="Nhập số điện thoại" style={{ borderRadius: 8, height: 40 }} />
                     </Form.Item>
 
                     <Form.Item
-                        label={<span style={{ color: '#fff' }}>Mật khẩu</span>}
+                        label="Mật khẩu"
                         name="User_Password"
                         rules={[
                             { required: true, message: 'Vui lòng nhập mật khẩu!' },
                             { min: 6, message: 'Mật khẩu phải từ 6 ký tự!' },
                         ]}
                     >
-                        <Input.Password placeholder="Nhập mật khẩu" />
+                        <Input.Password placeholder="Nhập mật khẩu" style={{ borderRadius: 8, height: 40 }} />
                     </Form.Item>
 
                     <Form.Item
-                        label={<span style={{ color: '#fff' }}>Xác nhận mật khẩu</span>}
+                        label="Xác nhận mật khẩu"
                         name="confirm"
                         dependencies={['User_Password']}
                         hasFeedback
@@ -126,26 +149,17 @@ const SignUpPage = () => {
                             }),
                         ]}
                     >
-                        <Input.Password placeholder="Nhập lại mật khẩu" />
+                        <Input.Password placeholder="Nhập lại mật khẩu" style={{ borderRadius: 8, height: 40 }} />
                     </Form.Item>
 
                     <Form.Item>
-                        <Button
-                            type="primary"
-                            htmlType="submit"
-                            block
-                            style={{
-                                background: 'rgba(61,110,53,0.8)',
-                                borderColor: 'rgba(61,110,53,0.8)',
-                                fontWeight: 'bold',
-                            }}
-                        >
+                        <StyledButton type="primary" htmlType="submit" block>
                             Đăng ký
-                        </Button>
+                        </StyledButton>
                     </Form.Item>
 
-                    <Form.Item style={{ textAlign: 'center', color: '#fff' }}>
-                        Đã có tài khoản? <Link to="/sign-in" style={{ color: '#fff', textDecoration: 'underline' }}>Đăng nhập</Link>
+                    <Form.Item style={{ textAlign: 'center', color: '#555' }}>
+                        Đã có tài khoản? <StyledLink to="/sign-in">Đăng nhập</StyledLink>
                     </Form.Item>
                 </Form>
             </SignUpWrapper>

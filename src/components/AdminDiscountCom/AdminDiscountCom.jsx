@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Table, Button, Modal, Form, InputNumber, DatePicker, Space, Popconfirm, message, Input } from 'antd';
 import { getAllDiscounts, createDiscount, updateDiscount, deleteDiscount } from '../../Service/DiscountService';
 import dayjs from 'dayjs';
+import { toast } from 'react-toastify';
 
 const AdminDiscountCom = () => {
     const [form] = Form.useForm();
@@ -46,23 +47,23 @@ const AdminDiscountCom = () => {
             setLoading(true);
             if (editingDiscount) {
                 await updateDiscount(editingDiscount._id, payload);
-                message.success('Cập nhật thành công');
+                toast.success('Cập nhật thành công');
             } else {
                 await createDiscount(payload);
-                message.success('Thêm thành công');
+                toast.success('Thêm thành công');
             }
             setLoading(false);
             setIsModalOpen(false);
             fetchDiscounts();
         } catch (err) {
             console.error(err);
-            message.error('Lỗi khi lưu thông tin');
+            toast.error('Lỗi khi lưu thông tin');
         }
     };
 
     const handleDelete = async (id) => {
         await deleteDiscount(id);
-        message.success('Đã xóa');
+        toast.success('Đã xóa');
         fetchDiscounts();
     };
 
@@ -132,9 +133,48 @@ const AdminDiscountCom = () => {
                     <Form.Item label="Ngày bắt đầu" name="Discount_Start_Date">
                         <DatePicker style={{ width: '100%' }} format="DD/MM/YYYY" />
                     </Form.Item>
-                    <Form.Item label="Ngày kết thúc" name="Discount_End_Date">
+                    <Form.Item
+                        label="Ngày bắt đầu"
+                        name="Discount_Start_Date"
+                        rules={[{ required: true, message: 'Vui lòng chọn ngày bắt đầu!' }]}
+                    >
                         <DatePicker style={{ width: '100%' }} format="DD/MM/YYYY" />
                     </Form.Item>
+
+                    <Form.Item noStyle shouldUpdate={(prev, cur) => prev.Discount_Start_Date !== cur.Discount_Start_Date}>
+                        {({ getFieldValue }) => {
+                            const start = getFieldValue('Discount_Start_Date');
+                            return (
+                                <Form.Item
+                                    label="Ngày kết thúc"
+                                    name="Discount_End_Date"
+                                    dependencies={['Discount_Start_Date']}
+                                    rules={[
+                                        { required: true, message: 'Vui lòng chọn ngày kết thúc!' },
+                                        ({ getFieldValue }) => ({
+                                            validator(_, value) {
+                                                const start = getFieldValue('Discount_Start_Date');
+                                                if (!value || !start || value.isAfter(start)) {
+                                                    return Promise.resolve();
+                                                }
+                                                return Promise.reject(new Error('Ngày kết thúc phải sau ngày bắt đầu!'));
+                                            },
+                                        }),
+                                    ]}
+                                >
+                                    <DatePicker
+                                        style={{ width: '100%' }}
+                                        format="DD/MM/YYYY"
+                                        disabledDate={(current) => {
+                                            const start = form.getFieldValue('Discount_Start_Date');
+                                            return start && current && (dayjs(current).isBefore(start, 'day') || dayjs(current).isSame(start, 'day'));
+                                          }}                                          
+                                    />
+                                </Form.Item>
+                            );
+                        }}
+                    </Form.Item>
+
                 </Form>
             </Modal>
         </>

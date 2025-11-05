@@ -50,6 +50,17 @@ const UserProfilePage = () => {
         }
     }, [user?.User_Id]);
 
+    useEffect(() => {
+        if (user) {
+            form.setFieldsValue({
+                User_Fullname: user.User_Fullname,
+                User_PhoneNumber: user.User_PhoneNumber,
+                User_Avatar: user?.User_Avatar,
+            });
+
+            setAvatarUrl(user.User_Avatar || '');
+        }
+    }, [user, form]);
 
     useEffect(() => {
         if (user && addressData) {

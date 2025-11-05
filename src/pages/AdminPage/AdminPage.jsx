@@ -16,9 +16,11 @@ import AdminPlantComponent from '../../components/AdminPlantComponent/AdminPlant
 import AdminCategoryComponent from '../../components/AdminCategoryComponent/AdminCategoryComponent';
 import AdminDiscountCom from '../../components/AdminDiscountCom/AdminDiscountCom';
 import AdminOrderCom from '../../components/AdminOrderCom/AdminOrderCom';
+import AdminDashBoardCom from '../../components/AdminDashBoardCom/AdminDashBoardComponent';
 
 const renderPage = (key) => {
     switch (key) {
+        case 'system': return (<AdminDashBoardCom />)
         case 'user': return (<AdminUserComponent />)
         case 'plant': return (<AdminPlantComponent />)
         case 'category': return (<AdminCategoryComponent />)

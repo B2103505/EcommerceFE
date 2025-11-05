@@ -17,10 +17,8 @@ const OrderFailedPage = () => {
       const res = await axios.post('http://localhost:3001/api/vnpay/create_payment_url', {
         orderId: orderId,
       });
-
-      const { data } = res;
-      if (data && data.paymentUrl) {
-        window.open(data.paymentUrl, '_blank');
+      if (res.data) {
+        window.open(res.data, '_blank');
       } else {
         toast.error('Không thể tạo lại link thanh toán.');
       }

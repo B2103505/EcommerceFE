@@ -1,59 +1,76 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+
 import TypeProduct from "../../components/TypeProduct/TypeProduct";
-import { CategoryItemStyled, WrapperBtnMore, WrapperProduct, WrapperTypeProduct } from "./Style";
 import SliderComponent from "../../components/SliderComponent/SliderComponent";
+import CardComponent from "../../components/CardComponent/CardComponent";
+import { CategoryItemStyled, WrapperBtnMore, WrapperProduct, WrapperTypeProduct } from "./Style";
+import FooterComponent from "../../components/FooterCom/FooterCom";
+
 import slider1 from '../../assets/images/slider_1.webp';
 import slider2 from '../../assets/images/slider_2.webp';
 import slider3 from '../../assets/images/slider_3.jpg';
-import CardComponent from "../../components/CardComponent/CardComponent";
-import NavBarComponent from "../../components/NavBarComponent/NavBarComponent";
-import { useQuery } from "@tanstack/react-query";
-import * as PlantService from '../../Service/PlantService'
+
+import * as PlantService from '../../Service/PlantService';
 import { getAllCategory } from '../../Service/CategoryService';
-import { useNavigate } from "react-router-dom";
+import { getTopPlantDetail } from '../../Service/StatsService';
 
 const HomePage = () => {
-
     const navigate = useNavigate();
     const [page, setPage] = useState(1);
     const [allPlants, setAllPlants] = useState([]);
     const [hasMore, setHasMore] = useState(true);
+    const [topPlants, setTopPlants] = useState([]);
 
+    // Lấy danh mục
     const fetchAllCategories = async () => {
         const res = await getAllCategory();
-        if (res?.status === 'OK') {
-            return res.data;
-        }
-        return [];
-    }
-
-    const fetchPlants = async (page) => {
-        const res = await PlantService.getAllPlant(page, 8);
-        if (res?.data?.length === 0 || res?.data?.length < 8) {
-            setHasMore(false); // Hết dữ liệu
-        }
-        setAllPlants(prev => [...prev, ...res.data]);
+        return res?.status === 'OK' ? res.data : [];
     };
+
+    // Lấy sản phẩm
+    const fetchPlants = async (page) => {
+        const res = await PlantService.getAllPlant({ page, limit: 8 });
+        if (!res?.data?.length || res.data.length < 8) setHasMore(false);
+
+        setAllPlants(prev => {
+            const newData = res.data.filter(p => !prev.some(old => old._id === p._id));
+            return [...prev, ...newData];
+        });
+    };
+
+    // Lấy top sản phẩm
+    useEffect(() => {
+        const fetchData = async () => {
+            await fetchPlants(page);
+
+            try {
+                const resTopPlants = await getTopPlantDetail();
+                setTopPlants(Array.isArray(resTopPlants) ? resTopPlants : []);
+            } catch (err) {
+                console.error("Error fetching top plants:", err);
+            }
+        };
+        fetchData();
+    }, [page]);
 
     const { data: categories } = useQuery({
         queryKey: ['Categories'],
         queryFn: fetchAllCategories
     });
 
-    React.useEffect(() => {
-        fetchPlants({ page, limit: 8 });
-        ;
-    }, [page]);
-
-    const handleLoadMore = () => {
-        setPage(prev => prev + 1);
-    };
+    const handleLoadMore = () => setPage(prev => prev + 1);
 
     return (
         <>
-            <div style={{ padding: '0 120px' }}>
+            <div style={{
+                maxWidth: 1200,
+                margin: '0 auto',
+                padding: '0 10px',  // padding nhỏ hơn cho mobile
+            }}>
                 <WrapperTypeProduct>
-                    {categories?.map((item) => (
+                    {categories?.map(item => (
                         <CategoryItemStyled
                             key={item._id}
                             onClick={() => navigate(`/cate/${item._id}`)}
@@ -62,34 +79,55 @@ const HomePage = () => {
                         </CategoryItemStyled>
                     ))}
                 </WrapperTypeProduct>
+            </div>
 
-            </div >
-            <div id="container" style={{ backgroundColor: '#efefef', padding: '0 120px', height: '100%' }}>
+            <div style={{
+                backgroundColor: '#f9f9f9', maxWidth: 1200,
+                margin: '0 auto', padding: '0 10px', minHeight: '100%'
+            }}>
                 <SliderComponent arrImgSlider={[slider1, slider2, slider3]} />
-                <WrapperProduct>
-                    {allPlants?.map((plant, index) => (
-                        <CardComponent
-                            key={plant._id}
-                            data={plant}
+
+                {topPlants.length > 0 && (
+                    <section style={{ marginTop: 40, padding: 20, borderRadius: 8, backgroundColor: '#f0f8ff' }}>
+                        <h2>Top sản phẩm bán chạy</h2>
+                        <WrapperProduct>
+                            {topPlants.map((plant, idx) => (
+                                <CardComponent key={`${plant._id}-${idx}`} data={plant} />
+                            ))}
+                        </WrapperProduct>
+                    </section>
+                )}
+
+                <section style={{ marginTop: 30, padding: 20, borderRadius: 8, backgroundColor: '#f0f8ff' }}>
+                    <h2>Danh sách sản phẩm</h2>
+                    <WrapperProduct>
+                        {allPlants.map((plant, idx) => (
+                            <CardComponent key={`${plant._id}-${idx}`} data={plant} />
+                        ))}
+                    </WrapperProduct>
+                </section>
+
+                {hasMore && (
+                    <div style={{ display: 'flex', justifyContent: 'center', marginTop: 20 }}>
+                        <WrapperBtnMore
+                            textBtn="Xem thêm"
+                            type="outline"
+                            onClick={handleLoadMore}
+                            styleBtn={{
+                                border: '1px solid #0b74e5',
+                                color: '#0b74e5',
+                                width: 240,
+                                height: 38,
+                                borderRadius: 6,
+                                fontWeight: 500
+                            }}
                         />
-                    ))}
-                </WrapperProduct>
-
-                <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
-                    <WrapperBtnMore textBtn="Xem thêm" type="outline"
-                        onClick={handleLoadMore}
-                        styleBtn={{
-                            border: '1px solid rgb(11,116,229)', color: 'rgb(11,116,229)',
-                            width: '240px', height: '38px', borderRadius: '4px'
-                        }}
-                        styleTextBtn={{ fontWeight: 500 }} />
-                </div>
-            </div>
-            <div style={{ height: '50px' }}>
-
-            </div>
+                    </div>
+                )}
+            </div >
+            <FooterComponent />
         </>
-    )
-}
+    );
+};
 
 export default HomePage;

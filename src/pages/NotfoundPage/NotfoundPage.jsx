@@ -7,7 +7,7 @@ const NotfoundPage = () => {
 
     return (
         <div>
-            <MapAddressCom
+            {/* <MapAddressCom
                 onSelect={({ lat, lng }) => {
                     setLatitude(lat);
                     setLongitude(lng);
@@ -16,7 +16,8 @@ const NotfoundPage = () => {
             <div style={{ marginTop: 20 }}>
                 <p><strong>Latitude:</strong> {latitude}</p>
                 <p><strong>Longitude:</strong> {longitude}</p>
-            </div>
+            </div> */}
+            Page not found
         </div>
     );
 };

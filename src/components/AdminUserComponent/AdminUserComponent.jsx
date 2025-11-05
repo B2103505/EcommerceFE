@@ -107,7 +107,6 @@ const AdminUserComponent = () => {
     const columns = [
         { title: "Họ tên", dataIndex: "User_Fullname", key: "User_Fullname" },
         { title: "Email", dataIndex: "User_Email", key: "User_Email" },
-        { title: "password", dataIndex: "User_Password", key: "User_Password" },
         { title: "SĐT", dataIndex: "User_PhoneNumber", key: "User_PhoneNumber" },
         {
             title: "Quyền",

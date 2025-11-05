@@ -61,5 +61,13 @@ export const searchAdvancedPlants = async (params) => {
     return res.data;
 };
 
+// Lấy các sản phẩm gợi ý cùng Plant_Context
+export const getSuggestedPlants = async (id, limit = 8) => {
+    const res = await axios.get(`${API_URL}/plant/${id}/suggested`, {
+        params: { limit }
+    });
+    return res.data;
+};
+
 
 

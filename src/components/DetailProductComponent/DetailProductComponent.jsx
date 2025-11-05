@@ -43,17 +43,33 @@ const DetailProductComponent = ({ data }) => {
     const defaultImage = 'https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png';
     const navigate = useNavigate();
 
+    // const handleOrder = async () => {
+    //     await handleAddToCart()
+    //     navigate('/order');
+    // };
+
     const handleOrder = async () => {
-        await handleAddToCart()
+        if (!userId) {
+            toast.warning('Vui lòng đăng nhập trước khi đặt hàng');
+            navigate('/sign-in');
+            return;
+        }
+
+        await handleAddToCart();
         navigate('/order');
     };
 
     const handleAddToCart = async () => {
+        if (!userId) {
+            toast.warning('Vui lòng đăng nhập trước khi thêm vào giỏ hàng');
+            navigate('/sign-in');
+            return;
+        }
+
         if (!data?._id || !quantity) {
             toast.warning('Thiếu thông tin sản phẩm hoặc số lượng');
             return;
         }
-
         try {
             const res = await addToCart({
                 User_Id: userId,

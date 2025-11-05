@@ -1,17 +1,14 @@
 import React, { useState } from 'react';
-import { Upload, Button, Image, Spin, message } from 'antd';
+import { Upload, Button, Image, Spin, message, Card, Typography, Row, Col } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import axios from 'axios';
+
+const { Title, Paragraph } = Typography;
 
 const PredictPage = () => {
     const [imageFile, setImageFile] = useState(null);
     const [resultImageUrl, setResultImageUrl] = useState(null);
     const [loading, setLoading] = useState(false);
-
-    const handleUploadChange = ({ file }) => {
-        setImageFile(file.originFileObj);
-        setResultImageUrl(null); // reset ảnh cũ nếu chọn ảnh mới
-    };
 
     const handlePredict = async () => {
         if (!imageFile) {
@@ -25,10 +22,9 @@ const PredictPage = () => {
         try {
             setLoading(true);
             const response = await axios.post('http://localhost:5000/predict', formData, {
-                responseType: 'blob', // nhận file ảnh từ Flask
+                responseType: 'blob',
             });
 
-            // Tạo URL blob từ ảnh trả về
             const imageBlob = new Blob([response.data], { type: 'image/jpeg' });
             const imageUrl = URL.createObjectURL(imageBlob);
             setResultImageUrl(imageUrl);
@@ -41,48 +37,72 @@ const PredictPage = () => {
     };
 
     return (
-        <div style={{ padding: 24 }}>
-            <h2>Nhận diện cây bằng YOLOv8</h2>
+        <div style={{
+            padding: '40px',
+            background: 'linear-gradient(135deg, #d4edda 0%, #fdf6e3 100%)',
+            minHeight: '100vh',
+            display: 'flex',
+            justifyContent: 'center'
+        }}>
+            <Card style={{ width: '100%', maxWidth: 900, borderRadius: 12, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                <Title level={2} style={{ textAlign: 'center' }}>Nhận diện cây bằng YOLOv8</Title>
+                <Paragraph style={{ textAlign: 'center', color: '#555' }}>
+                    Chọn ảnh cây cảnh để hệ thống nhận diện và đánh dấu.
+                </Paragraph>
 
-            <Upload
-                accept="image/*"
-                beforeUpload={() => false}
-                maxCount={1}
-                showUploadList={true}
-                onChange={(info) => {
-                    const file = info.fileList[0]?.originFileObj;
-                    if (file) {
-                        setImageFile(file);
-                        setResultImageUrl(null); // reset nếu chọn ảnh mới
-                    }
-                }}
-            >
-                <Button icon={<UploadOutlined />}>Chọn ảnh</Button>
-            </Upload>
-
-
-            <Button
-                type="primary"
-                onClick={handlePredict}
-                disabled={!imageFile}
-                loading={loading}
-                style={{ marginTop: 16 }}
-            >
-                Nhận diện
-            </Button>
-
-            {loading && (
-                <div style={{ marginTop: 24 }}>
-                    <Spin tip="Đang nhận diện ảnh..." />
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
+                    <Upload
+                        accept="image/*"
+                        beforeUpload={() => false}
+                        maxCount={1}
+                        showUploadList={false}
+                        onChange={(info) => {
+                            const file = info.fileList[0]?.originFileObj;
+                            if (file) {
+                                setImageFile(file);
+                                setResultImageUrl(null);
+                            }
+                        }}
+                    >
+                        <Button icon={<UploadOutlined />}>Chọn ảnh</Button>
+                    </Upload>
                 </div>
-            )}
 
-            {resultImageUrl && (
-                <div style={{ marginTop: 24 }}>
-                    <h3>Ảnh sau khi nhận diện:</h3>
-                    <Image src={resultImageUrl} alt="Kết quả" width={500} />
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
+                    <Button
+                        type="primary"
+                        onClick={handlePredict}
+                        disabled={!imageFile}
+                        loading={loading}
+                        size="large"
+                    >
+                        Nhận diện
+                    </Button>
                 </div>
-            )}
+
+                {loading && (
+                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
+                        <Spin tip="Đang nhận diện ảnh..." size="large" />
+                    </div>
+                )}
+
+                {resultImageUrl && (
+                    <div style={{ marginTop: 24 }}>
+                        <Row gutter={[16, 16]} justify="center">
+                            <Col xs={24} md={12}>
+                                <Card title="Ảnh gốc" bordered={false} style={{ textAlign: 'center' }}>
+                                    <Image src={URL.createObjectURL(imageFile)} alt="Ảnh gốc" style={{ maxHeight: 300, objectFit: 'contain' }} />
+                                </Card>
+                            </Col>
+                            <Col xs={24} md={12}>
+                                <Card title="Ảnh sau khi nhận diện" bordered={false} style={{ textAlign: 'center' }}>
+                                    <Image src={resultImageUrl} alt="Kết quả" style={{ maxHeight: 300, objectFit: 'contain' }} />
+                                </Card>
+                            </Col>
+                        </Row>
+                    </div>
+                )}
+            </Card>
         </div>
     );
 };

@@ -4,6 +4,9 @@ import styled from "styled-components";
 export const WrapperProduct = styled.div`
     padding: 20px 0;
     width: 100%;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
 `;
 
 export const WrapperNavBar = styled(Col)`
